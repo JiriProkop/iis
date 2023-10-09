@@ -1,2 +1,7 @@
-# iis
-Project to system design class
+# Iis
+Project for Information Systems class.
+
+## Authors:
+- Jiří Prokop
+- Patrik Čerbák
+- Radek Janečka
