@@ -19,7 +19,7 @@ class UserEntity
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50)]
     private ?string $user_role = null;
 
     public function getId(): ?int
