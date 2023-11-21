@@ -24,6 +24,9 @@ class Room
     #[ORM\OneToMany(mappedBy: 'room', targetEntity: OwnActivity::class)]
     private Collection $personal_activities;
 
+    #[ORM\Column(length: 10)]
+    private ?string $name = null;
+
     public function __construct()
     {
         $this->roomActivities = new ArrayCollection();
@@ -103,6 +106,18 @@ class Room
                 $personalActivity->setRoom(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
 
         return $this;
     }

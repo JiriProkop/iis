@@ -52,6 +52,12 @@ class ClassEntity
         return $this->abbr;
     }
 
+    public function setAbbr(string $abbr): static
+    {
+        $this->abbr = $abbr;
+        return $this;
+    }
+
     public function getName(): ?string
     {
         return $this->name;
