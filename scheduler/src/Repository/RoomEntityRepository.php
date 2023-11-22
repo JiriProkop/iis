@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\RoomActivity;
+use App\Entity\RoomEntity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<RoomActivity>
+ * @extends ServiceEntityRepository<RoomEntity>
  *
- * @method RoomActivity|null find($id, $lockMode = null, $lockVersion = null)
- * @method RoomActivity|null findOneBy(array $criteria, array $orderBy = null)
- * @method RoomActivity[]    findAll()
- * @method RoomActivity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method RoomEntity|null find($id, $lockMode = null, $lockVersion = null)
+ * @method RoomEntity|null findOneBy(array $criteria, array $orderBy = null)
+ * @method RoomEntity[]    findAll()
+ * @method RoomEntity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class RoomActivityRepository extends ServiceEntityRepository
+class RoomEntityRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, RoomActivity::class);
+        parent::__construct($registry, RoomEntity::class);
     }
 
 //    /**
-//     * @return RoomActivity[] Returns an array of RoomActivity objects
+//     * @return RoomEntity[] Returns an array of RoomEntity objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +36,7 @@ class RoomActivityRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?RoomActivity
+//    public function findOneBySomeField($value): ?RoomEntity
 //    {
 //        return $this->createQueryBuilder('r')
 //            ->andWhere('r.exampleField = :val')
