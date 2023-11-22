@@ -26,3 +26,6 @@ Load testing data into the db.
 
 Destroing the db.
 `symfony console doctrine:database:drop`
+
+## Testing
+just the `symfony local:server:start`

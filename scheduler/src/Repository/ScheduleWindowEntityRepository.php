@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\SchedulerWindow;
+use App\Entity\ScheduleWindowEntity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<SchedulerWindow>
+ * @extends ServiceEntityRepository<ScheduleWindowEntity>
  *
- * @method SchedulerWindow|null find($id, $lockMode = null, $lockVersion = null)
- * @method SchedulerWindow|null findOneBy(array $criteria, array $orderBy = null)
- * @method SchedulerWindow[]    findAll()
- * @method SchedulerWindow[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ScheduleWindowEntity|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ScheduleWindowEntity|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ScheduleWindowEntity[]    findAll()
+ * @method ScheduleWindowEntity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SchedulerWindowRepository extends ServiceEntityRepository
+class ScheduleWindowEntityRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, SchedulerWindow::class);
+        parent::__construct($registry, ScheduleWindowEntity::class);
     }
 
 //    /**
-//     * @return SchedulerWindow[] Returns an array of SchedulerWindow objects
+//     * @return ScheduleWindowEntity[] Returns an array of ScheduleWindowEntity objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +36,7 @@ class SchedulerWindowRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?SchedulerWindow
+//    public function findOneBySomeField($value): ?ScheduleWindowEntity
 //    {
 //        return $this->createQueryBuilder('s')
 //            ->andWhere('s.exampleField = :val')

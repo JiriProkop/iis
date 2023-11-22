@@ -16,138 +16,171 @@ class ClassEntity
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 5)]
-    private ?string $abbr = "";
+    #[ORM\Column(length: 20)]
+    private ?string $Abbreviation = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\Column(length: 100)]
+    private ?string $Name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    private ?string $anotation = null;
+    private ?string $Anotation = null;
 
     #[ORM\Column]
-    private ?int $credit_number = null;
+    private ?int $Credits = null;
 
-    #[ORM\OneToMany(mappedBy: 'Class', targetEntity: TeachingActivity::class, orphanRemoval: true)]
-    private Collection $teachingActivities;
+    #[ORM\ManyToOne(inversedBy: 'Guatanted_classes')]
+    private ?PersonEntity $Guarantor = null;
 
-    #[ORM\OneToMany(mappedBy: 'class', targetEntity: UserInClass::class)]
-    private Collection $userInClasses;
+    #[ORM\ManyToMany(targetEntity: PersonEntity::class, inversedBy: 'Classes')]
+    private Collection $People;
+
+    #[ORM\OneToMany(mappedBy: 'Class', targetEntity: ClassActivityEntity::class, orphanRemoval: true)]
+    private Collection $Activities;
 
     public function __construct()
     {
-        $this->teachingActivities = new ArrayCollection();
-        $this->userInClasses = new ArrayCollection();
+        $this->Students = new ArrayCollection();
+        $this->Teachers = new ArrayCollection();
+        $this->Activities = new ArrayCollection();
     }
-
-    //TODO tady mozna bude potreba udelat jeste setter, nevim jak to funguje. V user kdyztak uz je, takze se possibly inspirovat tam
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getAbbr(): ?string
+    public function getAbbreviation(): ?string
     {
-        return $this->abbr;
+        return $this->Abbreviation;
     }
 
-    public function setAbbr(string $abbr): static
+    public function setAbbreviation(string $Abbreviation): static
     {
-        $this->abbr = $abbr;
+        $this->Abbreviation = $Abbreviation;
+
         return $this;
     }
 
     public function getName(): ?string
     {
-        return $this->name;
+        return $this->Name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $Name): static
     {
-        $this->name = $name;
+        $this->Name = $Name;
 
         return $this;
     }
 
     public function getAnotation(): ?string
     {
-        return $this->anotation;
+        return $this->Anotation;
     }
 
-    public function setAnotation(string $anotation): static
+    public function setAnotation(string $Anotation): static
     {
-        $this->anotation = $anotation;
+        $this->Anotation = $Anotation;
 
         return $this;
     }
 
-    public function getCreditNumber(): ?int
+    public function getCredits(): ?int
     {
-        return $this->credit_number;
+        return $this->Credits;
     }
 
-    public function setCreditNumber(int $credit_number): static
+    public function setCredits(int $Credits): static
     {
-        $this->credit_number = $credit_number;
+        $this->Credits = $Credits;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, TeachingActivity>
-     */
-    public function getTeachingActivities(): Collection
+    public function getGuarantor(): ?PersonEntity
     {
-        return $this->teachingActivities;
+        return $this->Guarantor;
     }
 
-    public function addTeachingActivity(TeachingActivity $teachingActivity): static
+    public function setGuarantor(?PersonEntity $Guarantor): static
     {
-        if (!$this->teachingActivities->contains($teachingActivity)) {
-            $this->teachingActivities->add($teachingActivity);
-            $teachingActivity->setClass($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTeachingActivity(TeachingActivity $teachingActivity): static
-    {
-        if ($this->teachingActivities->removeElement($teachingActivity)) {
-            // set the owning side to null (unless already changed)
-            if ($teachingActivity->getClass() === $this) {
-                $teachingActivity->setClass(null);
-            }
-        }
+        $this->Guarantor = $Guarantor;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, UserInClass>
+     * @return Collection<int, PersonEntity>
      */
-    public function getUserInClasses(): Collection
+    public function getStudents(): Collection
     {
-        return $this->userInClasses;
+        return $this->Students;
     }
 
-    public function addUserInClass(UserInClass $userInClass): static
+    public function addStudent(PersonEntity $student): static
     {
-        if (!$this->userInClasses->contains($userInClass)) {
-            $this->userInClasses->add($userInClass);
-            $userInClass->setClass($this);
+        if (!$this->Students->contains($student)) {
+            $this->Students->add($student);
         }
 
         return $this;
     }
 
-    public function removeUserInClass(UserInClass $userInClass): static
+    public function removeStudent(PersonEntity $student): static
     {
-        if ($this->userInClasses->removeElement($userInClass)) {
+        $this->Students->removeElement($student);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PersonEntity>
+     */
+    public function getTeachers(): Collection
+    {
+        return $this->Teachers;
+    }
+
+    public function addTeacher(PersonEntity $teacher): static
+    {
+        if (!$this->Teachers->contains($teacher)) {
+            $this->Teachers->add($teacher);
+        }
+
+        return $this;
+    }
+
+    public function removeTeacher(PersonEntity $teacher): static
+    {
+        $this->Teachers->removeElement($teacher);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ClassActivityEntity>
+     */
+    public function getActivities(): Collection
+    {
+        return $this->Activities;
+    }
+
+    public function addActivity(ClassActivityEntity $activity): static
+    {
+        if (!$this->Activities->contains($activity)) {
+            $this->Activities->add($activity);
+            $activity->setClass($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivity(ClassActivityEntity $activity): static
+    {
+        if ($this->Activities->removeElement($activity)) {
             // set the owning side to null (unless already changed)
-            if ($userInClass->getClass() === $this) {
-                $userInClass->setClass(null);
+            if ($activity->getClass() === $this) {
+                $activity->setClass(null);
             }
         }
 
