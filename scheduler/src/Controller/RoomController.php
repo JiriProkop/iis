@@ -25,7 +25,8 @@ class RoomController extends AbstractController
         $this->em = $em;
     }
     
-    #[Route('/room/admin/list', name: 'admin_rooms_list')]
+    // #[Route('/room/admin/list', name: 'admin_rooms_list')]
+    #[Route('/', name: 'admin_rooms_list')]
     public function listRooms(): Response
     {
         $res = [];
@@ -94,5 +95,16 @@ class RoomController extends AbstractController
             'room' => $room,
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/room/admin/delete/{id}', name: 'admin_room_delete', methods: ['GET', 'DELETE'])]
+    public function delete($id): Response
+    {
+        $room = $this->roomRepository->find($id);
+
+        $this->em->remove($room);
+        $this->em->flush();
+
+        return $this->redirectToRoute('admin_rooms_list');
     }
 }
