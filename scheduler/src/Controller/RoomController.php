@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+
 use App\Entity\RoomEntity;
+use App\Repository\RoomEntityRepository;
+use App\Form\RoomFormType;
 use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -15,21 +18,18 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RoomController extends AbstractController
 {
-    #[Route('/rooms', name: 'rooms_list')]
-    public function index(ManagerRegistry $doctrine): Response
-    {
-        $rooms = $doctrine->getRepository(RoomEntity::class)->findAll();
-
-        return $this->render('room/index.html.twig', [
-            'rooms' => $rooms,
-        ]);
+    private RoomEntityRepository $roomRepository;
+    private EntityManagerInterface $em;
+    public function __construct(RoomEntityRepository $roomEntityRepository, EntityManagerInterface $em) {
+        $this->roomRepository = $roomEntityRepository;
+        $this->em = $em;
     }
-
-    #[Route('/', name: 'rooms_listing')]
-    public function listRoomz(ManagerRegistry $doctrine): Response
+    
+    #[Route('/room/admin/list', name: 'admin_rooms_list')]
+    public function listRooms(): Response
     {
         $res = [];
-        $rooms = $doctrine->getRepository(RoomEntity::class)->findAll();
+        $rooms = $this->roomRepository->findAll();
         foreach ($rooms as $room) {
             $res[$room->getId()] = [
                 'id' => $room->getId(),
@@ -40,14 +40,59 @@ class RoomController extends AbstractController
             foreach ($room->getTeachedActivities() as $roomActivity) {
                 $res[$room->getId()]['activities'][$roomActivity->getId()] = [
                     'name' => $roomActivity->getName(),
-                    'length' => $roomActivity->getLength(),
-                    'repetition' => $roomActivity->getRepetition(),
+                    'id' => $roomActivity->getId(),
                 ];
             }
         }
 
         return $this->render('room/index.html.twig', [
             'res' => $res,
+        ]);
+    }
+
+    #[Route('/room/admin/create', name: 'admin_room_create')]
+    public function create(Request $request): Response
+    {
+        $person = new RoomEntity();
+        $form = $this->createForm(RoomFormType::class, $person);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $newPerson = $form->getData();
+            
+            // TODO validace dat zde $form->get('...');
+
+            $this->em->persist($newPerson);
+            $this->em->flush();
+
+            return $this->redirectToRoute('admin_rooms_list');
+        }
+
+        return $this->render('person/create.html.twig', [
+           'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/room/admin/edit/{id}', name: 'admin_room_edit')]
+    public function edit($id, Request $request): Response
+    {
+        $room = $this->roomRepository->find($id);
+        $form = $this->createForm(RoomFormType::class, $room);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // TODO validace dat zde $form->get('...');
+            
+            $room->setName($form->get('Name')->getData());
+            $room->setType($form->get('Type')->getData());
+
+            $this->em->flush();
+            return $this->redirectToRoute('admin_rooms_list');
+        }
+
+        return $this->render('room/edit.html.twig', [
+            'room' => $room,
+            'form' => $form->createView(),
         ]);
     }
 }
