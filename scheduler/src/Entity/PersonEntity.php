@@ -36,6 +36,9 @@ class PersonEntity
     #[ORM\OneToMany(mappedBy: 'Teacher', targetEntity: ClassActivityEntity::class)]
     private Collection $ClassActivities;
 
+    #[ORM\Column(length: 10)]
+    private ?string $Login = null;
+
     public function __construct()
     {
         $this->Guatanted_classes = new ArrayCollection();
@@ -226,6 +229,18 @@ class PersonEntity
                 $classActivity->setTeacher(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLogin(): ?string
+    {
+        return $this->Login;
+    }
+
+    public function setLogin(string $Login): static
+    {
+        $this->Login = $Login;
 
         return $this;
     }
