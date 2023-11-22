@@ -18,9 +18,9 @@
                 {# Assuming roomActivities is a Collection of related entities #}
                 <ul>
                     {% for activity in room.activities %}
-                        <li>{{ activity.name }}</li>
-                        <li>{{ activity.length }}</li>
-                        <li>{{ activity.repetition }}</li>
+                        <li>name: {{ activity.name }}</li>
+                        <li>length: {{ activity.length }}</li>
+                        <li>repetition: {{ activity.repetition }}</li>
                     {% endfor %}
                 </ul>
             </li>

@@ -36,10 +36,11 @@ class AppFixtures extends Fixture
         $activity->setLength(2);
         $activity->setClass($class);
         $activity->setTeacher($user);
-
+        
         $room = new Room();
         $room->setName('D202');
         $room->setType('prednaskovna');
+        $room->addTeachedActivity($activity);
 
         $window1 = new ScheduleWindowEntity();
         $window1->setClassActivity($activity);
