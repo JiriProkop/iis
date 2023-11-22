@@ -39,8 +39,7 @@ class ClassEntity
 
     public function __construct()
     {
-        $this->Students = new ArrayCollection();
-        $this->Teachers = new ArrayCollection();
+        $this->People = new ArrayCollection();
         $this->Activities = new ArrayCollection();
     }
 
@@ -112,47 +111,23 @@ class ClassEntity
     /**
      * @return Collection<int, PersonEntity>
      */
-    public function getStudents(): Collection
+    public function getPeople(): Collection
     {
-        return $this->Students;
+        return $this->People;
     }
 
-    public function addStudent(PersonEntity $student): static
+    public function addPerson(PersonEntity $person): static
     {
-        if (!$this->Students->contains($student)) {
-            $this->Students->add($student);
+        if (!$this->People->contains($person)) {
+            $this->People->add($person);
         }
 
         return $this;
     }
 
-    public function removeStudent(PersonEntity $student): static
+    public function removePeople(PersonEntity $person): static
     {
-        $this->Students->removeElement($student);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, PersonEntity>
-     */
-    public function getTeachers(): Collection
-    {
-        return $this->Teachers;
-    }
-
-    public function addTeacher(PersonEntity $teacher): static
-    {
-        if (!$this->Teachers->contains($teacher)) {
-            $this->Teachers->add($teacher);
-        }
-
-        return $this;
-    }
-
-    public function removeTeacher(PersonEntity $teacher): static
-    {
-        $this->Teachers->removeElement($teacher);
+        $this->People->removeElement($person);
 
         return $this;
     }
