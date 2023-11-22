@@ -16,53 +16,84 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $user = new User();
-        $user->setLogin('xlogin00');
-        $user->setPassword('xpassword00');
-        $user->setEmail('omegalul@gmail.com');
-        $user->setRole('teacher');
+        // create users
+        $user_teacher = new User();
+        $user_teacher->setLogin('xlogin00');
+        $user_teacher->setPassword('xpassword00');
+        $user_teacher->setEmail('omegalul@gmail.com');
+        $user_teacher->setRole('teacher');
 
-        $class = new ClassEntity();
-        $class->setName('tvorba webových aplikací');
-        $class->setAbbreviation('ITW');
-        $class->setAnotation('Tvorba webových aplikací je predmet o tvoreni wekových aplikací. To se vas taky bude snazit
+        $user_admin = new User();
+        $user_admin->setLogin('xspage12');
+        $user_admin->setPassword('AdMiNaDmIn');
+        $user_admin->setRole('admin');
+        $user_admin->setEmail('feelsOkayMan@gmail.com');
+
+        $user_timesheeter = new User();
+        $user_timesheeter->setLogin('xtimes32');
+        $user_timesheeter->setPassword('time32sheet');
+        $user_timesheeter->setRole('timesheeter');
+        $user_timesheeter->setEmail('pepela@gmail.com');
+
+        $user_student = new User();
+        $user_student->setLogin('xstude09');
+        $user_student->setPassword('sTudent09');
+        $user_student->setRole('student');
+        $user_student->setEmail('peepoHappy@gmail.com');
+
+        $class_ITW = new ClassEntity();
+        $class_ITW->setName('tvorba webových aplikací');
+        $class_ITW->setAbbreviation('ITW');
+        $class_ITW->setAnotation('Tvorba webových aplikací je predmet o tvoreni wekových aplikací. To se vas taky bude snazit
         naucit. Budete se ucit o PHP, HTML, CSS, JS, SQL, a vsechno ostatni co se hodi k vytvoreni wekobé aplikace. glhf');
-        $class->setGuarantor($user);
-        $class->setCredits(5);
+        $class_ITW->setCredits(5);
 
-        $activity = new ClassActivityEntity();
-        $activity->setName('prednaska');
-        $activity->setRepetition('tydne');
-        $activity->setLength(2);
-        $activity->setClass($class);
-        $activity->setTeacher($user);
+        $class_ITW->setGuarantor($user_teacher);
+        $class_ITW->addPerson($user_teacher);
+        $class_ITW->addPerson($user_student);
+
+        $activity_prednaska = new ClassActivityEntity();
+        $activity_prednaska->setName('prednaska');
+        $activity_prednaska->setRepetition('tydne');
+        $activity_prednaska->setLength(2);
+        $activity_prednaska->setClass($class_ITW);
+        $activity_prednaska->setTeacher($user_teacher);
+
+        $room_D202 = new Room();
+        $room_D202->setName('D202');
+        $room_D202->setType('prednaskovna');
         
-        $room = new Room();
-        $room->setName('D202');
-        $room->setType('prednaskovna');
-        $room->addTeachedActivity($activity);
+        $room_D202->addTeachedActivity($activity_prednaska);
 
-        $window1 = new ScheduleWindowEntity();
-        $window1->setClassActivity($activity);
-        $window1->setStart(new \DateTime('2021-03-01 08:00:00'));
+        $window_act_prednaska = new ScheduleWindowEntity();
+        $window_act_prednaska->setClassActivity($activity_prednaska);
+        $window_act_prednaska->setStart(new \DateTime('2021-03-01 08:00:00'));
 
-        $personalActivity = new OwnActivity();
-        $personalActivity->setDescription('Setkani ohledne bakalarky se studenty.');
-        $personalActivity->setRepetition('liche tydny');
-        $personalActivity->setRoom($room);
-        $personalActivity->setPerson($user);
+        $activity_personal = new OwnActivity();
+        $activity_personal->setDescription('Setkani ohledne bakalarky se studenty.');
+        $activity_personal->setRepetition('liche tydny');
+        $activity_personal->setRoom($room_D202);
+        $activity_personal->setPerson($user_teacher);
 
-        $window2 = new ScheduleWindowEntity();
-        $window2->setPersonalActivity($personalActivity);
-        $window2->setStart(new \DateTime('2021-03-01 10:00:00'));
+        $window_act_personal = new ScheduleWindowEntity();
+        $window_act_personal->setPersonalActivity($activity_personal);
+        $window_act_personal->setStart(new \DateTime('2021-03-01 10:00:00'));
 
-        $manager->persist($window1);
-        $manager->persist($window2);
-        $manager->persist($personalActivity);
-        $manager->persist($room);
-        $manager->persist($class);
-        $manager->persist($user);
-        $manager->persist($activity);
+        // users
+        $manager->persist($user_teacher);
+        $manager->persist($user_admin);
+        $manager->persist($user_timesheeter);
+        $manager->persist($user_student);
+        // classes (subjects)
+        $manager->persist($class_ITW);
+        // activities
+        $manager->persist($activity_prednaska);
+        $manager->persist($activity_personal);
+        // rooms
+        $manager->persist($room_D202);
+        // windows
+        $manager->persist($window_act_prednaska);
+        $manager->persist($window_act_personal);
         $manager->flush();
     }
 }
