@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\PersonEntity;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,8 +16,10 @@ class PersonFormType extends AbstractType
         $builder
             ->add('Email')
             ->add('Password')
-            ->add('Role')
             ->add('Login')
+            ->add('roles', CollectionType::class, [
+                'entry_type' => TextType::class,
+            ]);
 //            ->add('Classes')
         ;
     }

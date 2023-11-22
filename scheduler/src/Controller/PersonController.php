@@ -55,7 +55,7 @@ class PersonController extends AbstractController
 
             $person->setEmail($form->get('Email')->getData());
             $person->setPassword($form->get('Password')->getData());
-            $person->setRole($form->get('Role')->getData());
+            $person->setRoles($form->get('roles')->getData());
             $person->setLogin($form->get('Login')->getData());
 
             $this->em->flush();
