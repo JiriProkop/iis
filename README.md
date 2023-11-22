@@ -18,14 +18,20 @@ https://symfony.com/doc/current/doctrine.html#installing-doctrine -->
 Install the db software on your pc.
 For fedora its here: https://docs.fedoraproject.org/en-US/quick-docs/installing-mysql-mariadb/
 
-Creating the db.
+- Creating the db:
 `symfony console doctrine:database:create`
 
-Load testing data into the db.
+- Load testing data into the db:
 `symfony console doctrine:fixtures:load`
 
-Destroing the db.
+- Destroing the db:
 `symfony console doctrine:database:drop`
+
+- Migrating the db:
+`symfony console doctrine:migrations:migrate`
+
 
 ## Testing
 just the `symfony local:server:start`
+
+
