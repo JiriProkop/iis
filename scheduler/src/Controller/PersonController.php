@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PersonController extends AbstractController
 {
@@ -21,16 +22,27 @@ class PersonController extends AbstractController
     }
 
     #[Route('/person/admin/create', name: 'admin_person_create')]
-    public function create(Request $request): Response
+    public function create(Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
         $person = new PersonEntity();
         $form = $this->createForm(PersonFormType::class, $person);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $newPerson = $form->getData();
-
             // TODO validace dat zde $form->get('...');
+
+            $newPerson = new PersonEntity();
+
+            $newPerson->setEmail($form->get('Email')->getData());
+            $newPerson->setRoles($form->get('roles')->getData());
+            $newPerson->setLogin($form->get('Login')->getData());
+
+            $hashedPassword = $passwordHasher->hashPassword(
+                $newPerson,
+                $form->get('Password')->getData()
+            );
+
+            $newPerson->setPassword($hashedPassword);
 
             $this->em->persist($newPerson);
             $this->em->flush();
@@ -44,7 +56,7 @@ class PersonController extends AbstractController
     }
 
     #[Route('/person/admin/edit/{id}', name: 'admin_person_edit')]
-    public function edit($id, Request $request): Response
+    public function edit($id, Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
         $person = $this->personRepository->find($id);
         $form = $this->createForm(PersonFormType::class, $person);
@@ -54,9 +66,15 @@ class PersonController extends AbstractController
             // TODO validace dat zde $form->get('...');
 
             $person->setEmail($form->get('Email')->getData());
-            $person->setPassword($form->get('Password')->getData());
-            $person->setRole($form->get('Role')->getData());
+            $person->setRoles($form->get('roles')->getData());
             $person->setLogin($form->get('Login')->getData());
+
+            $hashedPassword = $passwordHasher->hashPassword(
+                $person,
+                $form->get('Password')->getData()
+            );
+
+            $person->setPassword($hashedPassword);
 
             $this->em->flush();
             return $this->redirectToRoute('admin_person');
