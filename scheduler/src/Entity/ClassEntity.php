@@ -28,7 +28,7 @@ class ClassEntity
     #[ORM\Column]
     private ?int $Credits = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Guatanted_classes')]
+    #[ORM\ManyToOne(inversedBy: 'Guaranted_classes')]
     private ?PersonEntity $Guarantor = null;
 
     #[ORM\ManyToMany(targetEntity: PersonEntity::class, inversedBy: 'Classes')]
@@ -125,7 +125,7 @@ class ClassEntity
         return $this;
     }
 
-    public function removePeople(PersonEntity $person): static
+    public function removePerson(PersonEntity $person): static
     {
         $this->People->removeElement($person);
 

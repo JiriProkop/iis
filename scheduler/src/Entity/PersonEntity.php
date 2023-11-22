@@ -6,26 +6,28 @@ use App\Repository\PersonEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: PersonEntityRepository::class)]
-class PersonEntity
+class PersonEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $Email = null;
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    private ?string $Email;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'string')]
     private ?string $Password = null;
 
-    #[ORM\Column(length: 100, nullable: true)]
-    private ?string $Role = null;
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     #[ORM\OneToMany(mappedBy: 'Guarantor', targetEntity: ClassEntity::class)]
-    private Collection $Guatanted_classes;
+    private Collection $Guaranted_classes;
 
     #[ORM\ManyToMany(targetEntity: ClassEntity::class, mappedBy: 'People')]
     private Collection $Classes;
@@ -41,9 +43,8 @@ class PersonEntity
 
     public function __construct()
     {
-        $this->Guatanted_classes = new ArrayCollection();
+        $this->Guaranted_classes = new ArrayCollection();
         $this->Classes = new ArrayCollection();
-        $this->Teaching_in_classes = new ArrayCollection();
         $this->PersonalActivities = new ArrayCollection();
         $this->ClassActivities = new ArrayCollection();
     }
@@ -58,33 +59,53 @@ class PersonEntity
         return $this->Email;
     }
 
-    public function setEmail(string $Email): static
+    public function setEmail(string $Email): self
     {
         $this->Email = $Email;
 
         return $this;
     }
 
-    public function getPassword(): ?string
+     /**
+     * The public representation of the user (e.g. a username, an email address, etc.)
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
     {
-        return $this->Password;
+        return (string) $this->Email;
     }
 
-    public function setPassword(string $Password): static
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        $this->Password = $Password;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
 
         return $this;
     }
 
-    public function getRole(): ?string
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
-        return $this->Role;
+        return $this->Password;
     }
 
-    public function setRole(?string $Role): static
+    public function setPassword(string $password): self
     {
-        $this->Role = $Role;
+        $this->Password = $password;
 
         return $this;
     }
@@ -94,13 +115,13 @@ class PersonEntity
      */
     public function getGuatantedClasses(): Collection
     {
-        return $this->Guatanted_classes;
+        return $this->Guaranted_classes;
     }
 
     public function addGuatantedClass(ClassEntity $guatantedClass): static
     {
-        if (!$this->Guatanted_classes->contains($guatantedClass)) {
-            $this->Guatanted_classes->add($guatantedClass);
+        if (!$this->Guaranted_classes->contains($guatantedClass)) {
+            $this->Guaranted_classes->add($guatantedClass);
             $guatantedClass->setGuarantor($this);
         }
 
@@ -109,7 +130,7 @@ class PersonEntity
 
     public function removeGuatantedClass(ClassEntity $guatantedClass): static
     {
-        if ($this->Guatanted_classes->removeElement($guatantedClass)) {
+        if ($this->Guaranted_classes->removeElement($guatantedClass)) {
             // set the owning side to null (unless already changed)
             if ($guatantedClass->getGuarantor() === $this) {
                 $guatantedClass->setGuarantor(null);
@@ -131,7 +152,7 @@ class PersonEntity
     {
         if (!$this->Classes->contains($class)) {
             $this->Classes->add($class);
-            $class->addStudent($this);
+            $class->addPerson($this);
         }
 
         return $this;
@@ -140,34 +161,7 @@ class PersonEntity
     public function removeClass(ClassEntity $class): static
     {
         if ($this->Classes->removeElement($class)) {
-            $class->removeStudent($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ClassEntity>
-     */
-    public function getTeachingInClasses(): Collection
-    {
-        return $this->Teaching_in_classes;
-    }
-
-    public function addTeachingInClass(ClassEntity $teachingInClass): static
-    {
-        if (!$this->Teaching_in_classes->contains($teachingInClass)) {
-            $this->Teaching_in_classes->add($teachingInClass);
-            $teachingInClass->addTeacher($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTeachingInClass(ClassEntity $teachingInClass): static
-    {
-        if ($this->Teaching_in_classes->removeElement($teachingInClass)) {
-            $teachingInClass->removeTeacher($this);
+            $class->removePerson($this);
         }
 
         return $this;
@@ -243,5 +237,25 @@ class PersonEntity
         $this->Login = $Login;
 
         return $this;
+    }
+
+    /**
+     * Returning a salt is only needed if you are not using a modern
+     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
+     *
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+     /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 }
