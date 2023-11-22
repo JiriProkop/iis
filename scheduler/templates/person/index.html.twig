@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin People Page{% endblock %}
+
+{% block body %}
+    <a href="/person/admin/create">Create person</a>
+    <ul>
+        {% for person in people %}
+        <li>
+            {{ person.id }} - {{ person.login }} - {{ person.password }} - {{ person.email }} -
+            <a href="/person/admin/edit/{{ person.id }}">EDIT</a> -
+            <a href="/person/admin/delete/{{ person.id }}">DELETE</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
