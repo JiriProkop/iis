@@ -21,7 +21,7 @@ class PersonEntity implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $Email;
 
     #[ORM\Column(type: 'string')]
-    private ?string $Password = null;
+    private ?string $password = null;
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
@@ -100,12 +100,12 @@ class PersonEntity implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getPassword(): string
     {
-        return $this->Password;
+        return $this->password;
     }
 
     public function setPassword(string $password): self
     {
-        $this->Password = $password;
+        $this->password = $password;
 
         return $this;
     }

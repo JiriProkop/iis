@@ -12,6 +12,10 @@ framework:
         cookie_secure: auto
         cookie_samesite: lax
         storage_factory_id: session.storage.factory.native
+        cookie_lifetime: 0 # 0 means "until the browser is closed"
+        use_cookies: true
+        gc_maxlifetime: 1800 # = 60 * 30 = 0.5h
+        # https://symfony.com/doc/current/session.html#session-idle-time-keep-alive
 
     #esi: true
     #fragments: true
