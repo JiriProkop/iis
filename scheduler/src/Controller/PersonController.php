@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\PersonEntity;
+use App\Form\PersonalPersonFormType;
 use App\Form\PersonFormType;
 use App\Repository\PersonEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,6 +20,48 @@ class PersonController extends AbstractController
     public function __construct(PersonEntityRepository $personEntityRepository, EntityManagerInterface $em) {
         $this->personRepository = $personEntityRepository;
         $this->em = $em;
+    }
+
+    #[Route('/person', name: 'person', methods: ['GET'])]
+    public function personal_index(): Response
+    {
+        $id = 2; // TODO get the id from session
+        $person = $this->personRepository->find($id);
+
+        return $this->render('person/personal_index.html.twig', [
+            'person' => $person,
+        ]);
+    }
+
+    #[Route('/person/edit', name: 'person_edit')]
+    public function personal_edit(Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $id = 2; // TODO
+
+        $person = $this->personRepository->find($id);
+        $form = $this->createForm(PersonalPersonFormType::class, $person);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // TODO validace dat zde $form->get('...');
+
+            $person->setEmail($form->get('Email')->getData());
+
+            $hashedPassword = $passwordHasher->hashPassword(
+                $person,
+                $form->get('Password')->getData()
+            );
+
+            $person->setPassword($hashedPassword);
+
+            $this->em->flush();
+            return $this->redirectToRoute('person');
+        }
+
+        return $this->render('person/edit.html.twig', [
+            'person' => $person,
+            'form' => $form->createView(),
+        ]);
     }
 
     #[Route('/person/admin/create', name: 'admin_person_create')]
