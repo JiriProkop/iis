@@ -7,6 +7,7 @@ use App\Form\PersonalPersonFormType;
 use App\Form\PersonFormType;
 use App\Repository\PersonEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,8 +26,7 @@ class PersonController extends AbstractController
     #[Route('/person', name: 'person', methods: ['GET'])]
     public function personal_index(): Response
     {
-        $id = 2; // TODO get the id from session
-        $person = $this->personRepository->find($id);
+        $person = $this->getUser();
 
         return $this->render('person/personal_index.html.twig', [
             'person' => $person,
@@ -36,26 +36,26 @@ class PersonController extends AbstractController
     #[Route('/person/edit', name: 'person_edit')]
     public function personal_edit(Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
-        $id = 2; // TODO
+        $person = $this->getUser();
 
-        $person = $this->personRepository->find($id);
         $form = $this->createForm(PersonalPersonFormType::class, $person);
+        if (!is_null($person)) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                // TODO validace dat zde $form->get('...');
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            // TODO validace dat zde $form->get('...');
+                $person->setEmail($form->get('Email')->getData());
 
-            $person->setEmail($form->get('Email')->getData());
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $person,
+                    $form->get('Password')->getData()
+                );
 
-            $hashedPassword = $passwordHasher->hashPassword(
-                $person,
-                $form->get('Password')->getData()
-            );
+                $person->setPassword($hashedPassword);
 
-            $person->setPassword($hashedPassword);
-
-            $this->em->flush();
-            return $this->redirectToRoute('person');
+                $this->em->flush();
+                return $this->redirectToRoute('person');
+            }
         }
 
         return $this->render('person/edit.html.twig', [

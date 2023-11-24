@@ -3,7 +3,11 @@
 {% block title %}Personal Info{% endblock %}
 
 {% block body %}
-    <h3>Login: {{ person.login }}</h3>
-    <h4>Email: {{ person.email }}</h4>
-    <a href="/person/edit">EDIT</a>
+    {% if person is null %}
+        Please login to view this page!
+    {% else %}
+        <h3>Login: {{ person.login }}</h3>
+        <h4>Email: {{ person.email }}</h4>
+        <a href="/person/edit">EDIT</a>
+    {% endif %}
 {% endblock %}
