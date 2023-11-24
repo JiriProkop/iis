@@ -82,16 +82,19 @@ class AppFixtures extends Fixture
         $window_act_prednaska = new ScheduleWindowEntity();
         $window_act_prednaska->setClassActivity($activity_prednaska);
         $window_act_prednaska->setStart(new \DateTime('2021-03-01 08:00:00'));
+        $window_act_prednaska->setEnd(new \DateTime('2021-03-01 10:00:00'));
 
         $activity_personal = new OwnActivity();
         $activity_personal->setDescription('Setkani ohledne bakalarky se studenty.');
         $activity_personal->setRepetition('liche tydny');
         $activity_personal->setRoom($room_D202);
         $activity_personal->setPerson($user_teacher);
+        $activity_personal->setLength(2);
 
         $window_act_personal = new ScheduleWindowEntity();
         $window_act_personal->setPersonalActivity($activity_personal);
         $window_act_personal->setStart(new \DateTime('2021-03-01 10:00:00'));
+        $window_act_personal->setEnd(new \DateTime('2021-03-01 12:00:00'));
 
         $om->persist($user_teacher);
         $om->persist($user_admin);
