@@ -6,9 +6,11 @@ use App\Repository\ClassEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClassEntityRepository::class)]
+#[UniqueEntity(fields: ['Abbreviation'], message: 'There is already a class with this abbreviation.')]
 class ClassEntity
 {
     #[ORM\Id]

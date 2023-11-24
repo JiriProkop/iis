@@ -17,10 +17,8 @@ security:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
     main:
-      # lazy: true
-      provider: app_user_provider  # Specify the provider for the main firewall
+      provider: app_user_provider
       form_login:
-        # "app_login" is the name of the route created previously
         login_path: app_login
         check_path: app_login
       logout:

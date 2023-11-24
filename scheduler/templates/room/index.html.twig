@@ -16,16 +16,6 @@
                 {{ room.type }} (ID: {{ room.name }})
                 <a href="/room/admin/edit/{{ room.id }}">EDIT</a>
                 <a href="/room/admin/delete/{{ room.id }}">DELETE</a>
-                {% if room.activities is not empty %}    
-                    <p style="font-weight: bold;">Activities:</p>
-                    <ul>
-                        {% for activity in room.activities %}
-                            <li>name: {{ activity.name }}</li>
-
-                            <a href="/user/activity/detail/{{ activity.id }}">detail</a>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
             </li>
         {% endfor %}
     </ul>

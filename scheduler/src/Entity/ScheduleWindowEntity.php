@@ -23,6 +23,9 @@ class ScheduleWindowEntity
     #[ORM\ManyToOne(inversedBy: 'ScheduledWindows')]
     private ?PersonalActivityEntity $PersonalActivity = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $End = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +63,18 @@ class ScheduleWindowEntity
     public function setPersonalActivity(?PersonalActivityEntity $PersonalActivity): static
     {
         $this->PersonalActivity = $PersonalActivity;
+
+        return $this;
+    }
+
+    public function getEnd(): ?\DateTimeInterface
+    {
+        return $this->End;
+    }
+
+    public function setEnd(?\DateTimeInterface $End): static
+    {
+        $this->End = $End;
 
         return $this;
     }
