@@ -38,8 +38,8 @@ class PersonController extends AbstractController
     {
         $person = $this->getUser();
 
-        $form = $this->createForm(PersonalPersonFormType::class, $person);
         if (!is_null($person)) {
+            $form = $this->createForm(PersonalPersonFormType::class, $person);
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 // TODO validace dat zde $form->get('...');
@@ -56,12 +56,14 @@ class PersonController extends AbstractController
                 $this->em->flush();
                 return $this->redirectToRoute('person');
             }
+
+            return $this->render('person/edit.html.twig', [
+                'person' => $person,
+                'form' => $form->createView(),
+            ]);
         }
 
-        return $this->render('person/edit.html.twig', [
-            'person' => $person,
-            'form' => $form->createView(),
-        ]);
+        return $this->redirectToRoute('person');
     }
 
     #[Route('/person/admin/create', name: 'admin_person_create')]
