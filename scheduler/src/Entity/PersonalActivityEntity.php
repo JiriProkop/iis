@@ -32,6 +32,9 @@ class PersonalActivityEntity
     #[ORM\JoinColumn(nullable: false)]
     private ?PersonEntity $Person = null;
 
+    #[ORM\Column]
+    private ?int $Length = null;
+
     public function __construct()
     {
         $this->ScheduledWindows = new ArrayCollection();
@@ -116,6 +119,18 @@ class PersonalActivityEntity
     public function setPerson(?PersonEntity $Person): static
     {
         $this->Person = $Person;
+
+        return $this;
+    }
+
+    public function getLength(): ?int
+    {
+        return $this->Length;
+    }
+
+    public function setLength(int $Length): static
+    {
+        $this->Length = $Length;
 
         return $this;
     }

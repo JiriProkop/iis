@@ -5,9 +5,11 @@ namespace App\Entity;
 use App\Repository\RoomEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RoomEntityRepository::class)]
+#[UniqueEntity(fields: ['Name'], message: 'There is already a room with this name.')]
 class RoomEntity
 {
     #[ORM\Id]
