@@ -14,31 +14,45 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    public function load(ObjectManager $manager): void
+    private UserPasswordHasherInterface $passwordHasher;
+    public function __construct(UserPasswordHasherInterface $passwordHasher) {
+        $this->passwordHasher = $passwordHasher;
+    }
+    
+    private function set_hashed_password(string $pwd, User $user): void
     {
+        $user->setPassword($this->passwordHasher->hashPassword(
+            $user,
+            $pwd
+        ));
+    }
+
+    public function load(ObjectManager $om): void
+    {
+        
         // create users
         $user_teacher = new User();
-        $user_teacher->setLogin('xlogin00');
-        $user_teacher->setPassword('xpassword00');
+        $user_teacher->setLogin('xteach00');
+        $this->set_hashed_password('xlogin00', $user_teacher);
         $user_teacher->setEmail('omegalul@gmail.com');
-        $user_teacher->setRole('teacher');
+        $user_teacher->setRoles(['ROLE_TEACHER']);
 
         $user_admin = new User();
         $user_admin->setLogin('xspage12');
-        $user_admin->setPassword('AdMiNaDmIn');
-        $user_admin->setRole('admin');
+        $this->set_hashed_password('adminos', $user_admin);
+        $user_admin->setRoles(['ROLE_ADMIN']);
         $user_admin->setEmail('feelsOkayMan@gmail.com');
 
         $user_timesheeter = new User();
         $user_timesheeter->setLogin('xtimes32');
-        $user_timesheeter->setPassword('time32sheet');
-        $user_timesheeter->setRole('timesheeter');
+        $this->set_hashed_password('time32sheet', $user_timesheeter);
+        $user_timesheeter->setRoles(['ROLE_SCHEDULER']);
         $user_timesheeter->setEmail('pepela@gmail.com');
 
         $user_student = new User();
         $user_student->setLogin('xstude09');
-        $user_student->setPassword('sTudent09');
-        $user_student->setRole('student');
+        $this->set_hashed_password('sTudent09', $user_student);
+        $user_student->setRoles(['ROLE_STUDENT']);
         $user_student->setEmail('peepoHappy@gmail.com');
 
         $class_ITW = new ClassEntity();
@@ -79,21 +93,20 @@ class AppFixtures extends Fixture
         $window_act_personal->setPersonalActivity($activity_personal);
         $window_act_personal->setStart(new \DateTime('2021-03-01 10:00:00'));
 
-        // users
-        $manager->persist($user_teacher);
-        $manager->persist($user_admin);
-        $manager->persist($user_timesheeter);
-        $manager->persist($user_student);
-        // classes (subjects)
-        $manager->persist($class_ITW);
-        // activities
-        $manager->persist($activity_prednaska);
-        $manager->persist($activity_personal);
-        // rooms
-        $manager->persist($room_D202);
-        // windows
-        $manager->persist($window_act_prednaska);
-        $manager->persist($window_act_personal);
-        $manager->flush();
+        $om->persist($user_teacher);
+        $om->persist($user_admin);
+        $om->persist($user_timesheeter);
+        $om->persist($user_student);
+        
+        $om->persist($class_ITW);
+
+        $om->persist($activity_prednaska);
+        $om->persist($activity_personal);
+
+        $om->persist($room_D202);
+
+        $om->persist($window_act_prednaska);
+        $om->persist($window_act_personal);
+        $om->flush();
     }
 }
