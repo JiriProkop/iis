@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\PersonEntity;
+use App\Form\PersonalPersonFormType;
 use App\Form\PersonFormType;
 use App\Repository\PersonEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +21,49 @@ class PersonController extends AbstractController
     public function __construct(PersonEntityRepository $personEntityRepository, EntityManagerInterface $em) {
         $this->personRepository = $personEntityRepository;
         $this->em = $em;
+    }
+
+    #[Route('/person', name: 'person', methods: ['GET'])]
+    public function personal_index(): Response
+    {
+        $person = $this->getUser();
+
+        return $this->render('person/personal_index.html.twig', [
+            'person' => $person,
+        ]);
+    }
+
+    #[Route('/person/edit', name: 'person_edit')]
+    public function personal_edit(Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $person = $this->getUser();
+
+        if (!is_null($person)) {
+            $form = $this->createForm(PersonalPersonFormType::class, $person);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                // TODO validace dat zde $form->get('...');
+
+                $person->setEmail($form->get('Email')->getData());
+
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $person,
+                    $form->get('Password')->getData()
+                );
+
+                $person->setPassword($hashedPassword);
+
+                $this->em->flush();
+                return $this->redirectToRoute('person');
+            }
+
+            return $this->render('person/edit.html.twig', [
+                'person' => $person,
+                'form' => $form->createView(),
+            ]);
+        }
+
+        return $this->redirectToRoute('person');
     }
 
     #[Route('/person/admin/create', name: 'admin_person_create')]
