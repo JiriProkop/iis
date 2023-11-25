@@ -96,6 +96,11 @@ class AppFixtures extends Fixture
         $window_act_personal->setStart(new \DateTime('2021-03-01 10:00:00'));
         $window_act_personal->setEnd(new \DateTime('2021-03-01 12:00:00'));
 
+        $window_act_personal2 = new ScheduleWindowEntity();
+        $window_act_personal2->setPersonalActivity($activity_personal);
+        $window_act_personal2->setStart(new \DateTime('2021-03-08 10:00:00'));
+        $window_act_personal2->setEnd(new \DateTime('2021-03-08 12:00:00'));
+
         $om->persist($user_teacher);
         $om->persist($user_admin);
         $om->persist($user_timesheeter);
@@ -110,6 +115,7 @@ class AppFixtures extends Fixture
 
         $om->persist($window_act_prednaska);
         $om->persist($window_act_personal);
+        $om->persist($window_act_personal2);
         $om->flush();
     }
 }

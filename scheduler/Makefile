@@ -6,6 +6,7 @@ help:
 	@echo "    updateEnv"
 	@echo "    migrateDatabase"
 	@echo "    updateDatabase"
+	@echo "    updateSchema"
 	@echo "    redoDatabase"
 	@echo "    createController Name=\"...\""
 
@@ -21,6 +22,9 @@ migrateDatabase:
 
 updateDatabase:
 	symfony console --no-interaction doctrine:fixtures:load
+
+updateSchema:
+	symfony console --force doctrine:schema:update
 
 redoDatabase:
 	symfony console --force doctrine:database:drop
