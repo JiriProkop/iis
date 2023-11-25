@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activities{% endblock %}
+
+{% block body %}
+<h1>List of activities</h1>
+
+<ul>
+    {% for activity in activities %}
+        <li>
+            {{ activity.id }} - {{ activity.Description }} - {{ activity.Repetition }} - {{ activity.Length }} - {{ activity.Room.Name}} - aktivita:
+        </li>
+        <ul>
+            {% for window in windows[activity.id] %}
+            <li><label>Start: </label>{{ window.Start.format('Y-m-d G:i:s') }}, <label>End: </label>{{ window.End.format('Y-m-d G:i:s') }}</li>
+            {% endfor %}
+        </ul>
+{#            <a href="/person/admin/edit/{{ person.id }}">EDIT</a> -#}
+{#            <a href="/person/admin/delete/{{ person.id }}">DELETE</a>#}
+    {% endfor %}
+</ul>
+{% endblock %}
