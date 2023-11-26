@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ScheduleController!{% endblock %}
+
+{% block body %}
+<style>
+        .schedule {
+            display: grid;
+            grid-template-columns: 150px repeat(5, 1fr); /* Fixed size for day titles and auto-fit for hours */
+            gap: 5px;
+        }
+
+        .hour-block, .day-title {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            white-space: nowrap;
+            background-color: #f9f9f9; /* Light grey background */
+        }
+
+        .day-title {
+            font-weight: bold;
+        }
+</style>
+
+<div class="day-title">Weekly Schedule</div>
+
+<form action="{{ path('update_week') }}" method="POST">
+    <label for="weekSelect">Select Week:</label>
+    <select id="weekSelect" name="weekNumber">
+        {% for weekNumber in 1..13 %}
+            <option value="{{ weekNumber }}" {% if weekNumber == selectedWeek %}selected="selected"{% endif %}>
+                Week {{ weekNumber }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Submit</button>
+</form>
+
+
+<div class="schedule">
+    <div class="hour-block"></div> <!-- Empty cell at the top-left corner -->
+    {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+        <div class="day-title">{{ day }}</div>
+    {% endfor %}
+    {% for hour in 7..20 %}
+        <div class="hour-block">
+            <strong>{{ hour }}:00 - {{ hour + 1 }}:00</strong>
+        </div>
+        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+            {% set activity = activities[day][hour] ?? null %}
+            <div class="hour-block">
+                {% if activity %}
+                    {{ activity.name }}<br>
+                    Rooms:
+                    {% for room in activity.rooms %}
+                        {{ room.name }}
+                    {% endfor %}
+                    <br>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+{% endblock %}
