@@ -67,7 +67,7 @@ class ClassActivityController extends AbstractController
             return $this->redirectToRoute('class_activities', ['id' => $id]);
         }
 
-        return $this->render('person_create.html.twig', [
+        return $this->render('person/person_create.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -104,7 +104,7 @@ class ClassActivityController extends AbstractController
             return $this->redirectToRoute('class_activities', ['id' => $id_class]);
         }
 
-        return $this->render('class/edit.html.twig', [
+        return $this->render('class_edit.html.twig', [
             'activity' => $activity,
             'form' => $form->createView(),
         ]);
@@ -195,7 +195,7 @@ class ClassActivityController extends AbstractController
             return $this->redirectToRoute('class_activities', ['id' => $id_class]);
         }
 
-        return $this->render('class/edit.html.twig', [
+        return $this->render('class_edit.html.twig', [
             'schedule' => $schedule,
             'form' => $form->createView(),
         ]);
