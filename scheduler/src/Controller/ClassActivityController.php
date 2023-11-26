@@ -59,6 +59,7 @@ class ClassActivityController extends AbstractController
             $newActivity->setName($form->get('Name')->getData());
             $newActivity->setLength($form->get('Length')->getData());
             $newActivity->setRepetition($form->get('Repetition')->getData());
+            $newActivity->setDraft(true);
 
             $this->em->persist($newActivity);
             $this->em->flush();
@@ -66,7 +67,7 @@ class ClassActivityController extends AbstractController
             return $this->redirectToRoute('class_activities', ['id' => $id]);
         }
 
-        return $this->render('person/create.html.twig', [
+        return $this->render('person_create.html.twig', [
             'form' => $form->createView(),
         ]);
     }

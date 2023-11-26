@@ -19,6 +19,8 @@ class constants
     ];
     const REPETITIONS = ['even' => 'even', 'odd' => 'odd', 'weekly' => 'weekly', 'none' => 'none'];
 
+    const EMAIL_PATTERN = '/[A-Za-z0-9.-_]*@([a-z]*.[a-z]*)*/';
+
     public function getFirstDayOfSemester(): \DateTime
     {
         return new \DateTime(self::STR_FIRST_DAY_OF_SEMESTER);

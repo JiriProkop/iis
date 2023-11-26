@@ -48,7 +48,7 @@ class ClassController extends AbstractController
             return $this->redirectToRoute('class_add_people', ['id' => $newClass->getId()]);
         }
 
-        return $this->render('person/create.html.twig', [
+        return $this->render('person_create.html.twig', [
             'form' => $form->createView(),
         ]);
     }

@@ -94,7 +94,7 @@ class PersonalActivityController extends AbstractController
             return $this->redirectToRoute('admin_person');
         }
 
-        return $this->render('person/create.html.twig', [
+        return $this->render('person_create.html.twig', [
             'form' => $form->createView(),
         ]);
     }
