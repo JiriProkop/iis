@@ -131,47 +131,7 @@ class PersonalActivityController extends AbstractController
         }
         return $this->redirectToRoute('app_login');
     }
-
-
-
-
-//    #[Route('/person/admin/create', name: 'admin_person_create')]
-//    public function createcopy(Request $request, UserPasswordHasherInterface $passwordHasher): Response
-//    {
-//        $person = new PersonEntity();
-//        $form = $this->createForm(PersonFormType::class, $person);
-//
-//        $form->handleRequest($request);
-//        if ($form->isSubmitted() && $form->isValid()) {
-              //TODO validace dat zde $form->get('...');
-//
-//            $newPerson = new PersonEntity();
-//
-//            $newPerson->setEmail($form->get('Email')->getData());
-//            $newPerson->setRoles($form->get('roles')->getData());
-//            $newPerson->setLogin($form->get('Login')->getData());
-//
-//            $hashedPassword = $passwordHasher->hashPassword(
-//                $newPerson,
-//                $form->get('Password')->getData()
-//            );
-//
-//            $newPerson->setPassword($hashedPassword);
-//
-//            $this->em->persist($newPerson);
-//            $this->em->flush();
-//
-//            return $this->redirectToRoute('admin_person');
-//        }
-//
-//        return $this->render('person/create.html.twig', [
-//            'form' => $form->createView(),
-//        ]);
-//    }
-
-
-
-
+    
     #[Route('/person/teacher/activity', name: 'personal_activity')]
     public function index(): Response
     {
