@@ -15,9 +15,6 @@ class ClassActivityFormType extends AbstractType
             ->add('Name')
             ->add('Repetition')
             ->add('Length')
-//            ->add('Rooms')
-//            ->add('Class')
-//            ->add('Teacher')
         ;
     }
 
