@@ -17,15 +17,20 @@ class constants
         'ROLE_STUDENT' => 'ROLE_STUDENT',
         'ROLE_ELSE' => 'ROLE_ELSE'
     ];
-    const REPETITIONS = ['even' => 'even', 'odd' => 'odd', 'weekly' => 'weekly', 'none' => 'none'];
+    const REPETITIONS = ['none' => 'none', 'even' => 'even', 'odd' => 'odd', 'weekly' => 'weekly'];
 
-    public function getFirstDayOfSemester(): \DateTime
+    public static function getFirstDayOfSemester(): \DateTime
     {
         return new \DateTime(self::STR_FIRST_DAY_OF_SEMESTER);
     }
 
-    public function getWeekInterval(): \DateInterval
+    public static function getWeekInterval(): \DateInterval
     {
         return new \DateInterval(self::STR_WEEK_INTERVAL);
+    }
+
+    public static function getHourInterval(int $hour): \DateInterval
+    {
+        return new \DateInterval('PT'.$hour.'H');
     }
 }
