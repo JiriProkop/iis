@@ -8,6 +8,8 @@ use App\Entity\PersonEntity;
 use App\Entity\ScheduleWindowEntity;
 use App\Form\PersonalActivityFormType;
 use App\Form\PersonFormType;
+use App\Repository\RoomEntityRepository;
+use Cassandra\Time;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +24,7 @@ class PersonalActivityController extends AbstractController
 {
     private PersonalActivityEntityRepository $personalActivityRepository;
     private ScheduleWindowEntityRepository $scheduleWindowRepository;
+    private RoomEntityRepository $roomRepository;
     private EntityManagerInterface $em;
     private \DateTime $date;
     private \DateTime $first_date;
@@ -30,9 +33,11 @@ class PersonalActivityController extends AbstractController
 
     public function __construct(PersonalActivityEntityRepository $personalActivityEntityRepository,
                                 ScheduleWindowEntityRepository $scheduleWindowEntityRepository,
+                                RoomEntityRepository $roomEntityRepository,
                                 EntityManagerInterface $em) {
         $this->personalActivityRepository = $personalActivityEntityRepository;
         $this->scheduleWindowRepository = $scheduleWindowEntityRepository;
+        $this->roomRepository = $roomEntityRepository;
         $this->em = $em;
         $this->date = new \DateTime('now');
         $this->first_date = self::getFirstDayofWeek($this->date);
@@ -58,36 +63,67 @@ class PersonalActivityController extends AbstractController
         $person = $this->getUser();
         if($person != null) {
             if($person->getRoles()[0] === 'ROLE_TEACHER') {
-                $personal_activity = new PersonalActivityEntity();
-                $Window = new ScheduleWindowEntity();
-                $form = $this->createForm(PersonalActivityFormType::class, null);
+                $form = $this->createForm(PersonalActivityFormType::class);
 
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
+                    $personal_activity = new PersonalActivityEntity();
+                    $Window = new ScheduleWindowEntity();
+
                     $from = $form->get('Time_from')->getData();
                     $to = $form->get('Time_to')->getData();
                     if($from >= $to){
-                        throw new \Error('Hour from and to are not in right order');
+                        return $this->render('personal_activity/create.html.twig', [
+                            'form' => $form->createView(),
+                            'warning' => '"Time from" is bigger or equal to "Time to".'
+                        ]);
                     }
-
-                    $date = $form->get('Date')->getData();
-                    echo $date;
                     // todo validation $this->scheduleWindowRepository->getWindowsForRoomBetween()
 
-                    if($form->get('Description')->getData() != null)
+                    if($form->get('Description')->getData() !== null)
                         $personal_activity->setDescription($form->get('Description')->getData());
-                    if($form->get('Room')->getData() != null)
-                        $personal_activity->setRoom($form->get('Room')->getData());
-                    // check the time of activity
+                    $personal_activity->setPerson($person);
+                    $length = $to->format('G');
+                    $length -= $from->format('G');
+                    $personal_activity->setLength($length);
+                    $str_room = $form->get('Room')->getData();
+                    // validation of room exists
+                    if($str_room !== '' && $str_room !== null) {
+                        $room = $this->roomRepository->findOneBy(['Name' => $str_room]);
+                        if ($room === null) {
+                            return $this->render('personal_activity/create.html.twig', [
+                                'form' => $form->createView(),
+                                'warning' => 'Room does not exist.'
+                            ]);
+                        }
+                        $personal_activity->setRoom($room);
+                    }
+                    $repetition = $form->get('Repetition')->getData();
+                    if($repetition === '')
+                        $repetition = constants::REPETITIONS['none'];
+                    $personal_activity->setRepetition($repetition);
 
+                    // create window //todo multiple windows
+                    $date = $form->get('Date')->getData();
+                    $date->add(constants::getHourInterval($from->format('G')));
+                    echo $date->format(' Y-m-d H');
+                    $Window->setPersonalActivity($personal_activity);
+                    $Window->setStart($date);
+                    $end_date = clone $date;
+                    $end_date->add(constants::getHourInterval($length));
+                    echo $date->format(' Y-m-d H');
+                    $Window->setEnd($end_date);
 
-                    $personal_activity->set($form->get('Date')->getData());
+                    $this->em->persist($personal_activity);
+                    $this->em->persist($Window);
+                    $this->em->flush();
 
-
+                    return $this->redirectToRoute('personal_activity');
 
                 }
                 return $this->render('personal_activity/create.html.twig', [
                     'form' => $form->createView(),
+                    'warning' => ''
                 ]);
 
             }
@@ -136,7 +172,7 @@ class PersonalActivityController extends AbstractController
 
 
 
-    #[Route('/person/teacher/activity', name: 'app_personal_activity')]
+    #[Route('/person/teacher/activity', name: 'personal_activity')]
     public function index(): Response
     {
         $person = $this->getUser();
