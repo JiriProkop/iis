@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Person{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+        <label style="color:red">{{ warning }}</label>
+    {{ form_widget(form) }}
+    <button type="submit">
+        Create
+    </button>
+
+    {{ form_end(form) }}
+{% endblock %}

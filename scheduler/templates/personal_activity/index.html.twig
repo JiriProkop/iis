@@ -4,11 +4,11 @@
 
 {% block body %}
 <h1>List of activities</h1>
-
+    <a href="/person/teacher/activity/create">Create personal activity</a>
 <ul>
     {% for activity in activities %}
         <li>
-            {{ activity.id }} - {{ activity.Description }} - {{ activity.Repetition }} - {{ activity.Length }} - {{ activity.Room.Name}} - aktivita:
+            {{ activity.id }} - {{ activity.Description }} - {{ activity.Repetition }} - {{ activity.Length }} {% if activity.Room is not null %} - {{ activity.Room.Name}} {% endif %} - aktivita:
         </li>
         <ul>
             {% for window in windows[activity.id] %}
