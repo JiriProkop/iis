@@ -37,6 +37,9 @@ class ClassActivityEntity
     #[ORM\ManyToOne(inversedBy: 'ClassActivities')]
     private ?PersonEntity $Teacher = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $draft = null;
+
     public function __construct()
     {
         $this->ScheduledWindows = new ArrayCollection();
@@ -158,6 +161,18 @@ class ClassActivityEntity
     public function setTeacher(?PersonEntity $Teacher): static
     {
         $this->Teacher = $Teacher;
+
+        return $this;
+    }
+
+    public function isDraft(): ?bool
+    {
+        return $this->draft;
+    }
+
+    public function setDraft(?bool $draft): static
+    {
+        $this->draft = $draft;
 
         return $this;
     }
