@@ -98,6 +98,8 @@ class ClassController extends AbstractController
             }
         }
 
+        // TODO vyfiltrovat jen ucitele pro zobrazeni
+
         $teachers = array();
         $potential_teachers = $this->personRepository->findAll();
         foreach ($potential_teachers as $pt) {
