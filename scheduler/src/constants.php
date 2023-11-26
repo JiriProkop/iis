@@ -33,4 +33,3 @@ class constants
     {
         return new \DateInterval('PT'.$hour.'H');
     }
-}
