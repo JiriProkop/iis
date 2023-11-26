@@ -68,7 +68,7 @@ class AppFixtures extends Fixture
 
         $activity_prednaska = new ClassActivityEntity();
         $activity_prednaska->setName('prednaska');
-        $activity_prednaska->setRepetition('tydne');
+        $activity_prednaska->setRepetition('weekly');
         $activity_prednaska->setLength(2);
         $activity_prednaska->setClass($class_ITW);
         $activity_prednaska->setTeacher($user_teacher);
@@ -86,7 +86,7 @@ class AppFixtures extends Fixture
 
         $activity_personal = new OwnActivity();
         $activity_personal->setDescription('Setkani ohledne bakalarky se studenty.');
-        $activity_personal->setRepetition('liche tydny');
+        $activity_personal->setRepetition('odd');
         $activity_personal->setRoom($room_D202);
         $activity_personal->setPerson($user_teacher);
         $activity_personal->setLength(2);

@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\constants;
 use App\Entity\PersonEntity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -20,7 +21,7 @@ class PersonFormType extends AbstractType
             ->add('Password', PasswordType::class)
             ->add('Login')
             ->add('roles', ChoiceType::class, [
-                'choices' => USER_ROLES,
+                'choices' => constants::USER_ROLES,
                 'multiple' => true,
                 'expanded' => true,
             ])
