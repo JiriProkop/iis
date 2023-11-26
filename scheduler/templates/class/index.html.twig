@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Classes Admin Page{% endblock %}
+
+{% block body %}
+    <a href="/class/admin/create">Create subject</a>
+    <ul>
+        {% for class in classes %}
+            <li>
+                {{ class.id }} - {{ class.abbreviation }} - {{ class.name }} atd...
+                <a href="/class/edit/{{ class.id }}">EDIT</a> -
+                <a href="/class/admin/delete/{{ class.id }}">DELETE</a> -
+                <a href="/class/{{ class.id }}/add_people">ADD PEOPLE</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
