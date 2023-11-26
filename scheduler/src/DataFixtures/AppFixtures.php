@@ -70,6 +70,7 @@ class AppFixtures extends Fixture
         $activity_prednaska->setName('prednaska');
         $activity_prednaska->setRepetition('weekly');
         $activity_prednaska->setLength(2);
+        $activity_prednaska->setDraft(false);
         $activity_prednaska->setClass($class_ITW);
         $activity_prednaska->setTeacher($user_teacher);
 
