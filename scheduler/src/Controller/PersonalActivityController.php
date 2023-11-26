@@ -68,7 +68,7 @@ class PersonalActivityController extends AbstractController
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
                     $personal_activity = new PersonalActivityEntity();
-                    $Window = new ScheduleWindowEntity();
+                    $Windows = [];
 
                     $from = $form->get('Time_from')->getData();
                     $to = $form->get('Time_to')->getData();
@@ -106,16 +106,17 @@ class PersonalActivityController extends AbstractController
                     // create window //todo multiple windows
                     $date = $form->get('Date')->getData();
                     $date->add(constants::getHourInterval($from->format('G')));
-                    echo $date->format(' Y-m-d H');
-                    $Window->setPersonalActivity($personal_activity);
-                    $Window->setStart($date);
+
+
+                    $Windows[0] = new ScheduleWindowEntity();
+                    $Windows[0]->setPersonalActivity($personal_activity);
+                    $Windows[0]->setStart($date);
                     $end_date = clone $date;
                     $end_date->add(constants::getHourInterval($length));
-                    echo $date->format(' Y-m-d H');
-                    $Window->setEnd($end_date);
+                    $Windows[0]->setEnd($end_date);
 
                     $this->em->persist($personal_activity);
-                    $this->em->persist($Window);
+                    $this->em->persist($Windows[0]);
                     $this->em->flush();
 
                     return $this->redirectToRoute('personal_activity');
