@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\constants;
 use App\Entity\PersonalActivityEntity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -13,25 +14,30 @@ use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PersonalActivityFormType
+class PersonalActivityFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('Description',TextType::class, ['required' => false ])
-            ->add('Initial day', DateType::class)
-            ->add('Activity from', TimeType::class, [
+            ->add('Room', TextType::class, ['required' => false])
+            ->add('Date', DateType::class)
+            ->add('Time_from', TimeType::class, [
                 'placeholder' => [
                     'hour' => 'hours',
                 ],
             ])
-            ->add('Activity to', TimeType::class, [
+            ->add('Time_to', TimeType::class, [
                 'placeholder' => [
                     'hour' => 'hours',
                 ],
             ])
-            ->add('Repetition',TextType::class, ['required' => false ])
-            ->add('Length', IntegerType::class, ['required' => false ])
+            ->add('Repetition',ChoiceType::class, [
+                'choices' => constants::REPETITIONS,
+                'multiple' => false,
+                'expanded' => false,
+            ])
+//            ->add('Length', IntegerType::class, ['required' => false ])
         ;
     }
 
