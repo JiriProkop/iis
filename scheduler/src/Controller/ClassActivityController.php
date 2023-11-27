@@ -183,6 +183,13 @@ class ClassActivityController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            // remove all already scheduled windows
+            if ($activity->getScheduledWindows() != null && $activity->getScheduledWindows()->count() > 0) {
+                foreach ($activity->getScheduledWindows() as $sw) {
+                    $activity->removeScheduledWindow($sw);
+                }
+            }
+
             if ($activity->getRepetition() == 'ONE_TIME') {
                 // if the activity is only a one time thing:
                 $newSchedule = new ScheduleWindowEntity();
