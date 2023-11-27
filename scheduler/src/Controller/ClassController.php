@@ -23,7 +23,7 @@ class ClassController extends AbstractController
         $this->em = $em;
     }
 
-    #[Route('/class', name: 'class')]
+    #[Route('/', name: 'class')]
     public function class(): Response
     {
         $user = $this->getUser();
