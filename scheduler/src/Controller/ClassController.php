@@ -279,6 +279,17 @@ class ClassController extends AbstractController
 
         $class= $this->classRepository->find($id);
 
+        // delete all activities
+        foreach ($class->getActivities() as $activity) {
+            // delete all activities' scheduled windows
+            foreach ($activity->getScheduledWindows() as $sw) {
+                $activity->removeScheduledWindow($sw);
+                $this->em->remove($sw);
+            }
+            $class->removeActivity($activity);
+            $this->em->remove($activity);
+        }
+
         $this->em->remove($class);
         $this->em->flush();
 

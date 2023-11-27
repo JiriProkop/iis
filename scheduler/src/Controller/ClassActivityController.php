@@ -155,6 +155,12 @@ class ClassActivityController extends AbstractController
         if (in_array('ROLE_ADMIN', $user->getRoles()) || ($user != null && $class->getGuarantor()->getId() == $user->getId())) {
             $activity = $this->activityRepository->find($id_activity);
 
+            // delete all scheduled windows
+            foreach ($activity->getScheduledWindows() as $sw) {
+                $activity->removeScheduledWindow($sw);
+                $this->em->remove($sw);
+            }
+
             $this->em->remove($activity);
             $this->em->flush();
         }
@@ -282,7 +288,7 @@ class ClassActivityController extends AbstractController
 
         // get the set time into a string
         $set_time = 'repetition: ' . $activity->getRepetition();
-        if ($activity->getScheduledWindows() != null) {
+        if ($activity->getScheduledWindows() != null && $activity->getScheduledWindows()->get(0) != null) {
             if ($activity->getRepetition() == 'ONE_TIME') {
                 $set_time = $set_time . ' date: ' . $activity->getScheduledWindows()->get(0)->getStart()->format('Y-m-d H:i');
             } else {
