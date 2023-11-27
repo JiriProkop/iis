@@ -23,7 +23,7 @@ class ClassController extends AbstractController
         $this->em = $em;
     }
 
-    #[Route('/class', name: 'class')]
+    #[Route('/', name: 'class')]
     public function class(): Response
     {
         $user = $this->getUser();
@@ -59,12 +59,12 @@ class ClassController extends AbstractController
     {
         $user = $this->getUser();
 
+        $class = $this->classRepository->find($id);
+
         $guarantees = false;
-        if (in_array('ROLE_ADMIN', $user->getRoles()) || ($user != null && $class->getGuarantor()->getId() == $user->getId())) {
+        if ($user != null && in_array('ROLE_ADMIN', $user->getRoles()) || ($user != null && $class->getGuarantor()->getId() == $user->getId())) {
             $guarantees = true;
         }
-
-        $class = $this->classRepository->find($id);
 
         $teachers = array();
         if ($class != null) {
@@ -132,7 +132,9 @@ class ClassController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // set things without need for validation
             $newClass->setAbbreviation($form->get('Abbreviation')->getData());
-            $newClass->setAnotation($form->get('Anotation')->getData());
+            if ($form->get('Anotation')->getData() != null) {
+                $newClass->setAnotation($form->get('Anotation')->getData());
+            }
             $newClass->setName($form->get('Name')->getData());
 
             // check credit count

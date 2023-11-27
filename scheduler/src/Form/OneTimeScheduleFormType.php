@@ -28,10 +28,14 @@ class OneTimeScheduleFormType extends AbstractType
             ->add('Rooms', ChoiceType::class, [
                 'multiple' => true,
                 'choices'  => $rooms_names,
-                'mapped' => false
+                'mapped' => false,
+                'label' => 'Room with the activity *'
             ])
             ->add('Start', DateTimeType::class, [
-                'widget' => 'single_text'
+                'widget' => 'single_text',
+                'label' => 'Select the activity date and time',
+                'mapped' => false,
+                'required' => false
             ]);
     }
 

@@ -189,73 +189,75 @@ class ClassActivityController extends AbstractController
                 $activity->addRoom($this->roomRepository->find($room_id));
             }
 
-            // remove all already scheduled windows
-            if ($activity->getScheduledWindows() != null && $activity->getScheduledWindows()->count() > 0) {
-                foreach ($activity->getScheduledWindows() as $sw) {
-                    $activity->removeScheduledWindow($sw);
-                }
-            }
-
-            if ($activity->getRepetition() == 'ONE_TIME') {
-                // if the activity is only a one time thing:
-                $newSchedule = new ScheduleWindowEntity();
-                // set start
-                $start = $form->get('Start')->getData();
-                $newSchedule->setStart(new \DateTime($start->format('Y-m-d H:i:s')));
-                // set end
-                $length = $activity->getLength();
-                $start->modify("+$length hour");
-                $newSchedule->setEnd(new \DateTime($start->format('Y-m-d H:i:s')));
-
-                $this->em->persist($newSchedule);
-                $activity->addScheduledWindow($newSchedule);
-            } else {
-                // if the activity is repeating:
-
-                // get first day of semester
-                $datetime = constants::getFirstDayOfSemester();
-
-                // and add the offset based on the chosen day
-                $offsetDays = new \DateInterval($form->get('Day')->getData());
-                $datetime->add($offsetDays);
-
-                // and based of the chosen hour
-                $offsetSeconds = $form->get('Start')->getData();
-                $datetime->modify("+ $offsetSeconds seconds");
-
-                // get the number of repetitions
-                if ($activity->getRepetition() == 'EVEN') {
-                    $times = constants::EVEN_WEEKS;
-                } else if ($activity->getRepetition() == 'ODD') {
-                    $times = constants::ODD_WEEKS;
-                    // the first week is even, so go forward one week
-                    $datetime->add(constants::getWeekInterval());
-                } else {
-                    $times = constants::TERM_LENGTH;
+            if ($form->get('Start')->getData() != null && $form->get('Day')->getData()) {
+                // remove all already scheduled windows
+                if ($activity->getScheduledWindows() != null && $activity->getScheduledWindows()->count() > 0) {
+                    foreach ($activity->getScheduledWindows() as $sw) {
+                        $activity->removeScheduledWindow($sw);
+                    }
                 }
 
-                for ($i = 0; $i < $times; $i++) {
+                if ($activity->getRepetition() == 'ONE_TIME') {
+                    // if the activity is only a one time thing:
                     $newSchedule = new ScheduleWindowEntity();
                     // set start
-                    $start = new \DateTime($datetime->format('Y-m-d H:i:s'));
-                    $newSchedule->setStart($start);
+                    $start = $form->get('Start')->getData();
+                    $newSchedule->setStart(new \DateTime($start->format('Y-m-d H:i:s')));
                     // set end
                     $length = $activity->getLength();
-                    $datetime->modify("+$length hour");
-                    $end = new \DateTime($datetime->format('Y-m-d H:i:s'));
-                    $newSchedule->setEnd($end);
-
-                    // modify the start time back
-                    $datetime->modify("-$length hour");
+                    $start->modify("+$length hour");
+                    $newSchedule->setEnd(new \DateTime($start->format('Y-m-d H:i:s')));
 
                     $this->em->persist($newSchedule);
                     $activity->addScheduledWindow($newSchedule);
+                } else {
+                    // if the activity is repeating:
 
-                    // go to next week
-                    $datetime->add(constants::getWeekInterval());
-                    if ($activity->getRepetition() != 'ALL') {
-                        // if odd or even, go one week more
+                    // get first day of semester
+                    $datetime = constants::getFirstDayOfSemester();
+
+                    // and add the offset based on the chosen day
+                    $offsetDays = new \DateInterval($form->get('Day')->getData());
+                    $datetime->add($offsetDays);
+
+                    // and based of the chosen hour
+                    $offsetSeconds = $form->get('Start')->getData();
+                    $datetime->modify("+ $offsetSeconds seconds");
+
+                    // get the number of repetitions
+                    if ($activity->getRepetition() == 'EVEN') {
+                        $times = constants::EVEN_WEEKS;
+                    } else if ($activity->getRepetition() == 'ODD') {
+                        $times = constants::ODD_WEEKS;
+                        // the first week is even, so go forward one week
                         $datetime->add(constants::getWeekInterval());
+                    } else {
+                        $times = constants::TERM_LENGTH;
+                    }
+
+                    for ($i = 0; $i < $times; $i++) {
+                        $newSchedule = new ScheduleWindowEntity();
+                        // set start
+                        $start = new \DateTime($datetime->format('Y-m-d H:i:s'));
+                        $newSchedule->setStart($start);
+                        // set end
+                        $length = $activity->getLength();
+                        $datetime->modify("+$length hour");
+                        $end = new \DateTime($datetime->format('Y-m-d H:i:s'));
+                        $newSchedule->setEnd($end);
+
+                        // modify the start time back
+                        $datetime->modify("-$length hour");
+
+                        $this->em->persist($newSchedule);
+                        $activity->addScheduledWindow($newSchedule);
+
+                        // go to next week
+                        $datetime->add(constants::getWeekInterval());
+                        if ($activity->getRepetition() != 'ALL') {
+                            // if odd or even, go one week more
+                            $datetime->add(constants::getWeekInterval());
+                        }
                     }
                 }
             }

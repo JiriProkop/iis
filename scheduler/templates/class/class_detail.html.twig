@@ -7,11 +7,11 @@
         <h1>{{ class.abbreviation }} - {{ class.name }}</h1>
         <h2>Credits: {{ class.credits }}</h2>
         {% if class.guarantor is not null %}<h3>Guarantor: {{ class.guarantor.login }}</h3>{% endif %}
-        {% if teachers is not null %}<h3>Teachers:
+        {% if teachers is not null %}<h3>Teachers:</h3>
             {% for t in teachers %}
-                {{ t.login }} -
+                {{ t.login }} <br>
             {% endfor %}
-        </h3>{% endif %}
+        {% endif %}
         <p>{{ class.anotation }}</p>
 
         {% if class.activities is not null %}
@@ -21,7 +21,7 @@
                     <li>
                         <b>Name:</b> {{ activity.name }} <b>Repetition:</b> {{ activity.repetition }} <b>Length:</b> {{ activity.length }}
                         {% if guarantees %}
-                            <a href="/class/{{ class.id }}/activity/{{ activity.id }}/schedule">SCHEDULE</a> -
+                            <a href="/class/{{ class.id }}/activity/{{ activity.id }}/schedule">PREPARE FOR SCHEDULING</a> -
                             <a href="/class/{{ class.id }}/activity/{{ activity.id }}/edit">EDIT</a> -
                             <a href="/class/{{ class.id }}/activity/{{ activity.id }}/delete">DELETE</a>
                         {% endif %}
@@ -30,7 +30,7 @@
             </ul>
         {% endif %}
         {% if guarantees %}
-            <a href="/class/{{ class.id }}/activity/create">Create activity</a>
+            <a href="/class/{{ class.id }}/activity/create">CREATE ACTIVITY</a>
         {% endif %}
     {% else %}
         This class does not exist!

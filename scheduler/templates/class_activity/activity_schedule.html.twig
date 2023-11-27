@@ -11,20 +11,21 @@
         <h3>Teacher: {% if activity.teacher is not null %}{{ activity.teacher.login }} <a href="remove_teacher">REMOVE</a>{% endif %}</h3>
         <ul>
             {% for teacher in teachers %}
-                <li>{{ teacher.login }} - <a href="set_teacher/{{ teacher.id }}">SET TEACHER</a></li>
+                <li>{{ teacher.login }} - <a href="set_teacher/{{ teacher.id }}">SET</a></li>
             {% endfor %}
         </ul>
 
         <h3>Set your desired time and room (might be changed later by the scheduler).</h3>
         <h4>Currenly set:</h4>
-        <b>Rooms:</b> {% for room in activity.rooms %} {{ room.name }} {% endfor %}
-        <b>Time:</b> {% if set_time is not null %}{{ set_time }}{% endif %}
+        <b>Rooms:</b> {% for room in activity.rooms %} {{ room.name }} {% endfor %}<br>
+        <b>Time:</b> {% if set_time is not null %}{{ set_time }}{% endif %}<br>
     {% endif %}
 
     {%  if form is not null %}
         {{ form_start(form) }}
         {{ form_widget(form) }}
         <button type="submit">Schedule</button>
+        <p>Fields with * are mandatory.</p>
         {{ form_end(form) }}
     {% endif %}
 {% endblock %}
