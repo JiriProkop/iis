@@ -73,7 +73,7 @@ class PersonalActivityController extends AbstractController
     {
         $person = $this->getUser();
         if($person !== null) {
-            if ($person->getRoles()[0] === 'ROLE_TEACHER') {
+            if ($person->getRoles()[0] === 'ROLE_TEACHER' || $person->getRoles()[0] === 'ROLE_ADMIN') {
                 $personal_activity = $this->personalActivityRepository->find($id);
                 if ($personal_activity !== null) {
                     $Windows = $this->scheduleWindowRepository->findBy(['PersonalActivity' => $personal_activity]);
@@ -95,7 +95,7 @@ class PersonalActivityController extends AbstractController
     {
         $person = $this->getUser();
         if($person !== null) {
-            if($person->getRoles()[0] === 'ROLE_TEACHER') {
+            if($person->getRoles()[0] === 'ROLE_TEACHER' || $person->getRoles()[0] === 'ROLE_ADMIN') {
                 $form = $this->createForm(PersonalActivityFormType::class);
 
                 $form->handleRequest($request);
@@ -175,7 +175,7 @@ class PersonalActivityController extends AbstractController
     {
         $person = $this->getUser();
         if($person !== null) {
-            if($person->getRoles()[0] === 'ROLE_TEACHER') {
+            if($person->getRoles()[0] === 'ROLE_TEACHER' || $person->getRoles()[0] === 'ROLE_ADMIN') {
                 $personId = $person->getId();
                 $activities = $this->personalActivityRepository->findBy(['Person' => $personId]);
                 $windows = [];

@@ -32,7 +32,7 @@
                 {% if 'ROLE_ADMIN' in app.user.roles or 'ROLE_SCHEDULER' in app.user.roles %}
                     <a href="/person/list">TEACHER-SCHEDULES</a>
                 {% endif %}
-                {% if 'ROLE_TEACHER' in app.user.roles %}
+                {% if 'ROLE_TEACHER' in app.user.roles or 'ROLE_ADMIN' in app.user.roles%}
                     <a href="/person/teacher/activity">TEACHER-ACTIVITIES</a>
                 {% endif %}
             {% else %}
