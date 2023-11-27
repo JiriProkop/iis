@@ -33,7 +33,9 @@ class OneTimeScheduleFormType extends AbstractType
             ])
             ->add('Start', DateTimeType::class, [
                 'widget' => 'single_text',
-                'label' => 'Select the activity date and time *'
+                'label' => 'Select the activity date and time',
+                'mapped' => false,
+                'required' => false
             ]);
     }
 

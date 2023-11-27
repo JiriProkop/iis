@@ -37,12 +37,14 @@ class RepeatingScheduleFormType extends AbstractType
                 'input'  => 'timestamp',
                 'widget' => 'choice',
                 'mapped' => false,
-                'label' => 'Select activity start time *'
+                'label' => 'Select activity start time',
+                'required' => false
             ])
             ->add('Day', ChoiceType::class, [
                 'choices' => constants::DAY_STR_FORMAT_INTERVALS,
                 'mapped' => false,
-                'label' => 'Select activity day *'
+                'label' => 'Select activity day',
+                'required' => false
             ]);
     }
 
