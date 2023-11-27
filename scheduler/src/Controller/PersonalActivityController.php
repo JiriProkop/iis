@@ -68,7 +68,6 @@ class PersonalActivityController extends AbstractController
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
                     $personal_activity = new PersonalActivityEntity();
-                    $Windows = [];
 
                     $from = $form->get('Time_from')->getData();
                     $to = $form->get('Time_to')->getData();
@@ -106,21 +105,29 @@ class PersonalActivityController extends AbstractController
                     // create window //todo multiple windows
                     $date = $form->get('Date')->getData();
                     $date->add(constants::getHourInterval($from->format('G')));
-
-
-                    $Windows[0] = new ScheduleWindowEntity();
-                    $Windows[0]->setPersonalActivity($personal_activity);
-                    $Windows[0]->setStart($date);
                     $end_date = clone $date;
                     $end_date->add(constants::getHourInterval($length));
-                    $Windows[0]->setEnd($end_date);
+                    $weeks_left = constants::getWeeksLeft($repetition, $date);
 
+                    for($i = 0; $i < $weeks_left; $i++) {
+                        if((constants::isEvenWeek($date) && $repetition === 'even')
+                            || (!constants::isEvenWeek($date) && $repetition === 'odd')
+                            || $repetition === 'weekly'
+                            || $repetition === 'none') {
+                            $Window = new ScheduleWindowEntity();
+                            $Window->setPersonalActivity($personal_activity);
+                            $Window->setStart(clone $date);
+                            $Window->setEnd(clone $end_date);
+                            $this->em->persist($Window);
+                        }
+                        $date->add(constants::getWeekInterval(1));
+                        $end_date->add(constants::getWeekInterval(1));
+                        echo 'times'.$i;
+                    }
                     $this->em->persist($personal_activity);
-                    $this->em->persist($Windows[0]);
                     $this->em->flush();
 
                     return $this->redirectToRoute('personal_activity');
-
                 }
                 return $this->render('personal_activity/create.html.twig', [
                     'form' => $form->createView(),

@@ -33,19 +33,23 @@ class constants
         return new \DateInterval('PT'.$hour.'H');
     }
 
-    public static function getIntegerRepetition(string $repetition, \DateTime $date): int
+    public static function getWeeksLeft(string $repetition, \DateTime $date): int
     {
         if($repetition === 'none'){
             return 1;
         }
-        elseif($repetition === 'tydne'){
+        else{
             $first_day_of_semester = self::getFirstDayOfSemester();
             $first_week_of_semester = intval($first_day_of_semester->format('W'));
             $week_of_date = intval($date->format('W'));
-            $difference_of_weeks = $week_of_date - $first_week_of_semester;
             $last_week = $first_week_of_semester + self::TERM_LENGTH;
-            return $last_week - $difference_of_weeks;
+            return $last_week - $week_of_date;
         }
-        return 2;
+    }
+
+    public static function isEvenWeek(\DateTime $date): bool
+    {
+        $week_of_date = intval($date->format('W'));
+        return $week_of_date % 2 === 0;
     }
 }
