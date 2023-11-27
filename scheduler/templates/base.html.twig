@@ -20,13 +20,13 @@
                     Logged in as: {{ app.user.login }}  -- {{ app.user.email }}
                 </div>
                 <a href="/logout">LOG OUT</a>
+                <a href="/my_schedule/{{ app.user.id }}">MY SCHEDULE</a>
             {% else %}
                 <div class="user-banner">
                     You are viewing as a guest.
                     <a href="/login">LOG IN</a>
                 </div>
             {% endif %}
-        
         </div>
 {% endblock %}
     </head>
