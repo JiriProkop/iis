@@ -7,11 +7,11 @@
         <h1>{{ class.abbreviation }} - {{ class.name }}</h1>
         <h2>Credits: {{ class.credits }}</h2>
         {% if class.guarantor is not null %}<h3>Guarantor: {{ class.guarantor.login }}</h3>{% endif %}
-        {% if teachers is not null %}<h3>Teachers:
+        {% if teachers is not null %}<h3>Teachers:</h3>
             {% for t in teachers %}
-                {{ t.login }} -
+                {{ t.login }} <br>
             {% endfor %}
-        </h3>{% endif %}
+        {% endif %}
         <p>{{ class.anotation }}</p>
 
         {% if class.activities is not null %}
