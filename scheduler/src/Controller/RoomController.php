@@ -26,8 +26,8 @@ class RoomController extends AbstractController
         $this->em = $em;
     }
 
-    // #[Route('/room/admin/list', name: 'admin_rooms_list')]
-    #[Route('/', name: 'admin_rooms_list')]
+    // #[Route('/', name: 'admin_rooms_list')]
+    #[Route('/room/admin/list', name: 'admin_rooms_list')]
     public function listRooms(): Response
     {
         $res = [];
@@ -61,7 +61,8 @@ class RoomController extends AbstractController
             return $this->redirectToRoute('admin_rooms_list');
         }
 
-        return $this->render('person_create.html.twig', [
+        return $this->render('room/create.html.twig', [
+            'room' => $room,
             'form' => $form->createView(),
         ]);
     }
