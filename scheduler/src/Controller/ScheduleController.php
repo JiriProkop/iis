@@ -286,12 +286,15 @@ class ScheduleController extends AbstractController
         $all_windows = $this->scheduleWindowRepository->findAll();
         $new_length = $activity->getLength();
         $new_window_end = clone $new_window->getStart();
-        $new_window_end->add(new \DateInterval('P' . $new_length . 'h'));
+        $new_window_end->add(new \DateInterval('PT' . $new_length . 'H'));
 
         foreach ($all_windows as $window) {
+            if($window->getClassActivity() == null){
+                continue;
+            }
             $length = $window->getClassActivity()->getLength();
             $window_end = clone $window->getStart();
-            $window_end->add(new \DateInterval('P' . $length . 'h'));
+            $window_end->add(new \DateInterval('PT' . $length . 'H'));
 
             if ($window->getStart() < $new_window_end && $window_end > $new_window->getStart()) {
                 return false;
