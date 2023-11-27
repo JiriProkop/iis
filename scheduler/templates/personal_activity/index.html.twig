@@ -9,14 +9,14 @@
     {% for activity in activities %}
         <li>
             {{ activity.id }} - {{ activity.Description }} - {{ activity.Repetition }} - {{ activity.Length }} {% if activity.Room is not null %} - {{ activity.Room.Name}} {% endif %} - aktivita:
+            <a href="/person/teacher/activity/delete/{{ activity.id }}">DELETE</a>
+            <a href="/person/teacher/activity/edit/{{ activity.id }}">EDIT</a>
         </li>
         <ul>
             {% for window in windows[activity.id] %}
             <li><label>Start: </label>{{ window.Start.format('Y-m-d G:i:s') }}, <label>End: </label>{{ window.End.format('Y-m-d G:i:s') }}</li>
             {% endfor %}
         </ul>
-{#            <a href="/person/admin/edit/{{ person.id }}">EDIT</a> -#}
-{#            <a href="/person/admin/delete/{{ person.id }}">DELETE</a>#}
     {% endfor %}
 </ul>
 {% endblock %}

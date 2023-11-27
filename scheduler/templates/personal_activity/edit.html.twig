@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create personal activity{% endblock %}
+{% block title %}Edit personal activity{% endblock %}
 
 {% block body %}
     {{ form_start(form) }}
         <label style="color:red">{{ warning }}</label>
     {{ form_widget(form) }}
     <button type="submit">
-        Create
+        Edit
     </button>
 
     {{ form_end(form) }}
