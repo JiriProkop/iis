@@ -35,10 +35,89 @@ class ClassController extends AbstractController
 
         $classes = $this->classRepository->findAll();
 
+        $registered = null;
+        $credits = 0;
+        if ($role == 'ROLE_STUDENT') {
+            $registered = $user->getClasses();
+            foreach ($registered as $r) {
+                $credits += $r->getCredits();
+                // the already registered class will appear only once
+                unset($classes[array_search($r, $classes)]);
+            }
+        }
+
         return $this->render('class/class_list.html.twig', [
+            'registered' => $registered,
+            'credits' => $credits,
             'classes' => $classes,
             'role' => $role,
         ]);
+    }
+
+    #[Route('/class/{id}/detail', name: 'class_detail')]
+    public function class_detail($id): Response
+    {
+        $user = $this->getUser();
+
+        $guarantees = false;
+        if (in_array('ROLE_ADMIN', $user->getRoles()) || ($user != null && $class->getGuarantor()->getId() == $user->getId())) {
+            $guarantees = true;
+        }
+
+        $class = $this->classRepository->find($id);
+
+        $teachers = array();
+        if ($class != null) {
+            foreach ($class->getPeople() as $person) {
+                if (in_array('ROLE_TEACHER', $person->getRoles())) {
+                    $teachers[] = $person;
+                }
+            }
+        }
+
+        return $this->render('class/class_detail.html.twig', [
+            'class' => $class,
+            'teachers' => $teachers,
+            'guarantees' => $guarantees,
+        ]);
+    }
+
+    #[Route('/class/{id}/register', name: 'class_register')]
+    public function class_register($id): Response
+    {
+        $user = $this->getUser();
+        if ($user == null || !in_array('ROLE_STUDENT', $user->getRoles())) {
+            return $this->redirectToRoute('class');
+        }
+
+        $class = $this->classRepository->find($id);
+
+        if ($class != null) {
+            $user->addClass($class);
+        }
+
+        $this->em->flush();
+
+        return $this->redirectToRoute('class');
+    }
+
+    #[Route('/class/{id}/unregister', name: 'class_unregister')]
+    public function class_unregister($id): Response
+    {
+        $user = $this->getUser();
+        if ($user == null || !in_array('ROLE_STUDENT', $user->getRoles())) {
+            return $this->redirectToRoute('class');
+        }
+
+        $class = $this->classRepository->find($id);
+
+        if ($class != null && in_array($class, $user->getClasses()->toArray())) {
+            $user->removeClass($class);
+        }
+
+        $this->em->flush();
+
+        return $this->redirectToRoute('class');
     }
 
     #[Route('/class/create', name: 'class_create')]
@@ -104,10 +183,21 @@ class ClassController extends AbstractController
             }
         }
 
+        // get already assigned teachers
+        $assigned_teachers = array();
+        if ($class != null) {
+            foreach ($class->getPeople() as $person) {
+                if (in_array('ROLE_TEACHER', $person->getRoles())) {
+                    $assigned_teachers[] = $person;
+                }
+            }
+        }
+
         return $this->render('class/add_people.html.twig', [
             'class' => $class,
             'guarantors' => $guarantors,
-            'teachers' => $teachers
+            'teachers' => $teachers,
+            'assigned_teachers' => $assigned_teachers
         ]);
     }
 
@@ -227,6 +317,17 @@ class ClassController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $class= $this->classRepository->find($id);
+
+        // delete all activities
+        foreach ($class->getActivities() as $activity) {
+            // delete all activities' scheduled windows
+            foreach ($activity->getScheduledWindows() as $sw) {
+                $activity->removeScheduledWindow($sw);
+                $this->em->remove($sw);
+            }
+            $class->removeActivity($activity);
+            $this->em->remove($activity);
+        }
 
         $this->em->remove($class);
         $this->em->flush();

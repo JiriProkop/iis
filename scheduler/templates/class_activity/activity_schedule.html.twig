@@ -7,6 +7,20 @@
         {{ error }}
     {% endif %}
 
+    {% if activity is not null %}
+        <h3>Teacher: {% if activity.teacher is not null %}{{ activity.teacher.login }} <a href="remove_teacher">REMOVE</a>{% endif %}</h3>
+        <ul>
+            {% for teacher in teachers %}
+                <li>{{ teacher.login }} - <a href="set_teacher/{{ teacher.id }}">SET TEACHER</a></li>
+            {% endfor %}
+        </ul>
+
+        <h3>Set your desired time and room (might be changed later by the scheduler).</h3>
+        <h4>Currenly set:</h4>
+        <b>Rooms:</b> {% for room in activity.rooms %} {{ room.name }} {% endfor %}
+        <b>Time:</b> {% if set_time is not null %}{{ set_time }}{% endif %}
+    {% endif %}
+
     {%  if form is not null %}
         {{ form_start(form) }}
         {{ form_widget(form) }}
