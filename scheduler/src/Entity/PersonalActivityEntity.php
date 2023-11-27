@@ -45,6 +45,11 @@ class PersonalActivityEntity
         return $this->id;
     }
 
+    public function getName(): ?string // just for compatibility with ClassActivityEntity
+    {
+        return $this->Description;
+    }
+
     public function getDescription(): ?string
     {
         return $this->Description;
@@ -70,6 +75,12 @@ class PersonalActivityEntity
     }
 
     public function getRoom(): ?RoomEntity
+    {
+        return $this->Room;
+    }
+
+
+    public function getRooms(): ?RoomEntity // again, just for compatibility with ClassActivityEntity
     {
         return $this->Room;
     }

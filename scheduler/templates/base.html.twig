@@ -20,15 +20,23 @@
                     Logged in as: {{ app.user.login }}  -- {{ app.user.email }}
                 </div>
                 <a href="/logout">LOG OUT</a>
+                {% if 'ROLE_STUDENT' in app.user.roles or 'ROLE_TEACHER' in app.user.roles %}
+                    <a href="/my_schedule/{{ app.user.id }}">MY SCHEDULE</a>
+                {% endif %}
+                {% if 'ROLE_STUDENT' in app.user.roles or 'ROLE_SCHEDULER' in app.user.roles %}
+                    <a href="/make_schedule">CREATE SCHEDULE</a>
+                {% endif %}
             {% else %}
                 <div class="user-banner">
                     You are viewing as a guest.
                     <a href="/login">LOG IN</a>
                 </div>
             {% endif %}
-        
         </div>
-{% endblock %}
+        {% endblock %}
+
+        <!-- Include Interact.js from CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.11/dist/interact.min.js"></script>
     </head>
     <body>
         {% block body %}{% endblock %}

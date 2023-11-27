@@ -8,7 +8,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,14 +17,19 @@ class PersonFormType extends AbstractType
     {
         $builder
             ->add('Email', EmailType::class)
-            ->add('Password', PasswordType::class)
+            ->add('Password', PasswordType::class, [
+                'required' => false
+            ])
+            ->add('PasswordAgain', PasswordType::class, [
+                'required' => false,
+                'mapped' => false
+            ])
             ->add('Login')
             ->add('roles', ChoiceType::class, [
                 'choices' => constants::USER_ROLES,
                 'multiple' => true,
                 'expanded' => true,
             ])
-//            ->add('Classes')
         ;
     }
 

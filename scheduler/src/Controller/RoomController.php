@@ -61,7 +61,7 @@ class RoomController extends AbstractController
             return $this->redirectToRoute('admin_rooms_list');
         }
 
-        return $this->render('person/create.html.twig', [
+        return $this->render('person_create.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -76,14 +76,7 @@ class RoomController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $room_name = $form->get('Name')->getData();
             $room_type = $form->get('Type')->getData();
-            
-            // name has to be unique
-            // $possibly_existing_room = $this->roomRepository->findOneBy(['Name' => $room_name]);
-            // if($possibly_existing_room !== null && $possibly_existing_room->getId() !== $room->getId()) {
-            //     return $this->render('person/create.html.twig', [
-            //         'form' => $form->createView(),
-            //     ]);
-            // }
+           
             $room->setName($room_name);
             $room->setType($room_type);
 
