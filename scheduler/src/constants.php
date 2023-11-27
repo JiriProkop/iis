@@ -6,6 +6,7 @@ class constants
 {
     // it's monday
     const STR_FIRST_DAY_OF_SEMESTER = '2024-02-05';
+    const STR_WEEK_INTERVAL = 'P1W';
     const TERM_LENGTH = 13;
     const DAY_STR_FORMAT_INTERVALS = ['Mon' => 'P0D', 'Tue' => 'P1D', 'Wed' => 'P2D', 'Thu' => 'P3D', 'Fri' => 'P4D', 'Sat' => 'P5D', 'Sun' => 'P6D'];
     const USER_ROLES = [
@@ -21,6 +22,11 @@ class constants
     public static function getFirstDayOfSemester(): \DateTime
     {
         return new \DateTime(self::STR_FIRST_DAY_OF_SEMESTER);
+    }
+
+    public static function getWeekInterval(): \DateInterval
+    {
+        return new \DateInterval(self::STR_WEEK_INTERVAL);
     }
 
     public static function getWeekIntervalFromInt(int $weeks): \DateInterval
