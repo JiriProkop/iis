@@ -200,8 +200,7 @@ class ClassActivityController extends AbstractController
                 // if the activity is repeating:
 
                 // get first day of semester
-                $constants = new constants();
-                $datetime = $constants->getFirstDayOfSemester();
+                $datetime = constants::getFirstDayOfSemester();
 
                 // and add the offset based on the chosen day
                 $offsetDays = new \DateInterval($form->get('Day')->getData());
@@ -217,7 +216,7 @@ class ClassActivityController extends AbstractController
                 } else if ($activity->getRepetition() == 'ODD') {
                     $times = constants::ODD_WEEKS;
                     // the first week is even, so go forward one week
-                    $datetime->add($constants->getWeekInterval());
+                    $datetime->add(constants::getWeekInterval());
                 } else {
                     $times = constants::TERM_LENGTH;
                 }
@@ -225,24 +224,23 @@ class ClassActivityController extends AbstractController
                 for ($i = 0; $i < $times; $i++) {
                     $newSchedule = new ScheduleWindowEntity();
                     // set start
-                    $start = $form->get('Start')->getData();
-                    $newSchedule->setStart(new \DateTime($start->format('Y-m-d H:i:s')));
+                    $newSchedule->setStart(new \DateTime($datetime->format('Y-m-d H:i:s')));
                     // set end
                     $length = $activity->getLength();
-                    $start->modify("+$length hour");
-                    $newSchedule->setEnd(new \DateTime($start->format('Y-m-d H:i:s')));
+                    $datetime->modify("+$length hour");
+                    $newSchedule->setEnd(new \DateTime($datetime->format('Y-m-d H:i:s')));
 
                     // modify the start time back
-                    $start->modify("-$length hour");
+                    $datetime->modify("-$length hour");
 
                     $this->em->persist($schedule);
                     $activity->addScheduledWindow($schedule);
 
                     // go to next week
-                    $datetime->add($constants->getWeekInterval());
+                    $datetime->add(constants::getWeekInterval());
                     if ($activity->getRepetition() != 'ALL') {
                         // if odd or even, go one week more
-                        $datetime->add($constants->getWeekInterval());
+                        $datetime->add(constants::getWeekInterval());
                     }
                 }
             }
