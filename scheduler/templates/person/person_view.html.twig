@@ -10,4 +10,7 @@
         <h4>Email: {{ person.email }}</h4>
         <a href="/person/{{ person.id }}/edit">EDIT</a>
     {% endif %}
+    {% if role == 'ROLE_ADMIN' %}
+        <a href="/person/list">VIEW ALL PEOPLE</a>
+    {% endif %}
 {% endblock %}

@@ -28,8 +28,15 @@ class PersonController extends AbstractController
     {
         $person = $this->getUser();
 
+        // get the role of the user
+        $role = null;
+        if ($person != null && $person->getRoles() != null) {
+            $role = $person->getRoles()[0];
+        }
+
         return $this->render('person/person_view.html.twig', [
             'person' => $person,
+            'role' => $role,
         ]);
     }
 
