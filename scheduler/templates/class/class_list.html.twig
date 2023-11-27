@@ -4,7 +4,7 @@
 
 {% block body %}
     {% if role == 'ROLE_ADMIN' %}
-        <a href="/class/create">Create class</a>
+        <a href="/class/create">CREATE CLASS</a>
     {% endif %}
     {% if role == 'ROLE_STUDENT' %}
         {% if credits is not null %}<b>Credits registered:</b> {{ credits }}{% endif %}
@@ -21,7 +21,7 @@
                 {% if role == 'ROLE_ADMIN' %}
                     <a href="/class/{{ class.id }}/edit">EDIT</a> -
                     <a href="/class/{{ class.id }}/delete">DELETE</a> -
-                    <a href="/class/{{ class.id }}/add_people">ADD PEOPLE</a> -
+                    <a href="/class/{{ class.id }}/add_people">ADD PEOPLE</a>
                 {% endif %}
                     <a href="/class/{{ class.id }}/detail">DETAIL</a>
                 {% if role == 'ROLE_STUDENT' %}

@@ -21,7 +21,8 @@ class ClassFormType extends AbstractType
                 'label' => 'Name of the class *'
             ])
             ->add('Anotation', TextType::class, [
-                'label' => 'Annotation'
+                'label' => 'Annotation',
+                'required' => false
             ])
             ->add('Credits', IntegerType::class, [
                 'label' => 'Credits *'

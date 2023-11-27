@@ -132,7 +132,9 @@ class ClassController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // set things without need for validation
             $newClass->setAbbreviation($form->get('Abbreviation')->getData());
-            $newClass->setAnotation($form->get('Anotation')->getData());
+            if ($form->get('Anotation')->getData() != null) {
+                $newClass->setAnotation($form->get('Anotation')->getData());
+            }
             $newClass->setName($form->get('Name')->getData());
 
             // check credit count

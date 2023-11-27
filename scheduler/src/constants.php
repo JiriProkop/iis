@@ -10,7 +10,7 @@ class constants
     const TERM_LENGTH = 13;
     const EVEN_WEEKS = 7;
     const ODD_WEEKS = 6;
-    const DAY_STR_FORMAT_INTERVALS = ['Mon' => 'P0D', 'Tue' => 'P1D', 'Wed' => 'P2D', 'Thu' => 'P3D', 'Fri' => 'P4D', 'Sat' => 'P5D', 'Sun' => 'P6D'];
+    const DAY_STR_FORMAT_INTERVALS = ['Mon' => 'P0D', 'Tue' => 'P1D', 'Wed' => 'P2D', 'Thu' => 'P3D', 'Fri' => 'P4D'];
     const USER_ROLES = [
         'ROLE_ADMIN' => 'ROLE_ADMIN',
         'ROLE_GUARANTOR' => 'ROLE_GUARANTOR',

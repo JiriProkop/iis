@@ -8,20 +8,21 @@
         {% if class.guarantor is not null %}
             {{ class.guarantor.login }} - <a href="/class/{{ class.id }}/remove_guarantor/">REMOVE</a>
         {% endif %}
+        <h3>Available guarantors:</h3>
         <ul>
             {% for g in guarantors %}
-                <li>{{ g.login }} - <a href="/class/{{ class.id }}/set_guarantor/{{ g.id }}">SET GUARANTOR</a></li>
+                <li>{{ g.login }} - <a href="/class/{{ class.id }}/set_guarantor/{{ g.id }}">SET</a></li>
             {% endfor %}
         </ul>
     {% endif %}
 
-    <h2>Vyucujici:</h2>
+    <h2>Teachers:</h2>
     <ul>
         {% for at in assigned_teachers %}
             <li>{{ at.login }} - <a href="/class/{{ class.id }}/remove_teacher/{{ at.id }}">REMOVE</a></li>
         {% endfor %}
     </ul>
-    <h3>Pridat vyucujiciho:</h3>
+    <h3>Add teachers:</h3>
     <ul>
         {% for t in teachers %}
             <li>{{ t.login }} - <a href="/class/{{ class.id }}/add_teacher/{{ t.id }}">ADD</a></li>
