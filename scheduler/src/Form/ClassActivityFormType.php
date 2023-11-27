@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\ClassActivityEntity;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,7 +14,14 @@ class ClassActivityFormType extends AbstractType
     {
         $builder
             ->add('Name')
-            ->add('Repetition')
+            ->add('Repetition', ChoiceType::class, [
+                'choices'  => [
+                    'ONE_TIME' => 'ONE_TIME',
+                    'ALL' => 'ALL',
+                    'EVEN' => 'EVEN',
+                    'ODD' => 'ODD',
+                    ],
+                ])
             ->add('Length')
         ;
     }

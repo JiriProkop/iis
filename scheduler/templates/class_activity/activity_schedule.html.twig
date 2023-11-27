@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Schedule Activity{% endblock %}
+
+{% block body %}
+    {% if error is not null %}
+        {{ error }}
+    {% endif %}
+
+    {%  if form is not null %}
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button type="submit">Schedule</button>
+        {{ form_end(form) }}
+    {% endif %}
+{% endblock %}
