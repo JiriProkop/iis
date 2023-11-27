@@ -33,8 +33,33 @@ class constants
         return new \DateInterval(self::STR_WEEK_INTERVAL);
     }
 
+    public static function getWeekIntervalFromInt(int $weeks): \DateInterval
+    {
+        return new \DateInterval('P'.$weeks.'W');
+    }
+
     public static function getHourInterval(int $hour): \DateInterval
     {
         return new \DateInterval('PT'.$hour.'H');
+    }
+
+    public static function getWeeksLeft(string $repetition, \DateTime $date): int
+    {
+        if($repetition === 'none'){
+            return 1;
+        }
+        else{
+            $first_day_of_semester = self::getFirstDayOfSemester();
+            $first_week_of_semester = intval($first_day_of_semester->format('W'));
+            $week_of_date = intval($date->format('W'));
+            $last_week = $first_week_of_semester + self::TERM_LENGTH;
+            return $last_week - $week_of_date;
+        }
+    }
+
+    public static function isEvenWeek(\DateTime $date): bool
+    {
+        $week_of_date = intval($date->format('W'));
+        return $week_of_date % 2 === 0;
     }
 }

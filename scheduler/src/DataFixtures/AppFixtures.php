@@ -48,7 +48,7 @@ class AppFixtures extends Fixture
 
         $user_timesheeter = new User();
         $user_timesheeter->setLogin('xtimes32');
-        $this->set_hashed_password('time32sheet', $user_timesheeter);
+        $this->set_hashed_password('time2sheet', $user_timesheeter);
         $user_timesheeter->setRoles(['ROLE_SCHEDULER']);
         $user_timesheeter->setEmail('pepela@gmail.com');
 

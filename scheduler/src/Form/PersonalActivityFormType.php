@@ -5,6 +5,7 @@ namespace App\Form;
 use App\constants;
 use App\Entity\PersonalActivityEntity;
 use App\Entity\ScheduleWindowEntity;
+use App\Repository\RoomEntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -18,17 +19,31 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PersonalActivityFormType extends AbstractType
 {
+    private RoomEntityRepository $roomRepository;
+    public function __construct(RoomEntityRepository $roomRepository) {
+        $this->roomRepository = $roomRepository;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $rooms = $this->roomRepository->findAll();
+        $room_names = ['none' => 'none'];
+        foreach ($rooms as $room) {
+            $room_names[$room->getName()] = $room->getId();
+        }
+
         $builder
             ->add('Description',TextareaType::class, ['required' => false ])
-            ->add('Room', TextType::class, [
+            ->add('Room', ChoiceType::class, [
                 'required' => false,
-                'mapped' => false
+                'multiple' => false,
+                'choices'  => $room_names,
+                'mapped' => false,
             ])
             ->add('Date', DateType::class, [
                 'widget' => 'choice',
-                'mapped' => false
+                'mapped' => false,
+                'label' => 'Date *'
             ])
             ->add('Time_from', TimeType::class, [
                 'widget' => 'choice',
@@ -36,7 +51,8 @@ class PersonalActivityFormType extends AbstractType
                 'placeholder' => [
                     'hour' => 'Hour',
                 ],
-                'mapped' => false
+                'mapped' => false,
+                'label' => 'Time from *'
             ])
             ->add('Time_to', TimeType::class, [
                 'widget' => 'choice',
@@ -44,14 +60,14 @@ class PersonalActivityFormType extends AbstractType
                 'placeholder' => [
                     'hour' => 'Hour',
                 ],
-                'mapped' => false
+                'mapped' => false,
+                'label' => 'Time to *'
             ])
             ->add('Repetition',ChoiceType::class, [
                 'choices' => constants::REPETITIONS,
                 'multiple' => false,
                 'expanded' => false,
             ])
-//            ->add('Length', IntegerType::class, ['required' => false ])
         ;
     }
 

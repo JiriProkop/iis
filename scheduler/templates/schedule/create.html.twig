@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My schedule{% endblock %}
+
+{% block body %}
+<style>
+        .schedule {
+            display: grid;
+            grid-template-columns: 150px repeat(5, 1fr); /* Fixed size for day titles and auto-fit for hours */
+            gap: 5px;
+        }
+
+        .hour-block, .day-title {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            white-space: nowrap;
+            background-color: #f9f9f9; /* Light grey background */
+        }
+
+        .day-title {
+            font-weight: bold;
+        }
+
+         .error-message {
+            color: red;
+            font-size: 1.2em;
+            margin-top: 10px;
+            width:100%;
+            display: flex;
+            justify-content: center;
+        }
+</style>
+
+<div class="day-title">Weekly Schedule</div>
+
+<form action="{{ path('update_room_make_schedule') }}" method="POST">
+    <label for="roomSelect">Select room:</label>
+    <select id="roomSelect" name="roomName">
+        {% for room in rooms %}
+            <option value="{{ room.name }}" {% if room.name == selectedRoom %}selected="selected"{% endif %}>
+                Room: {{ room.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Submit</button>
+</form>
+
+<form action="{{ path('oddevenweek_make_schedule') }}" method="POST">
+    <label for="oddnessSelect">Week:</label>
+    <select id="oddnessSelect" name="oddness">
+            <option value="-1" {% if -1 == oddness %}selected="selected"{% endif %}>
+                ODD WEEKS
+            </option>
+            <option value="0" {% if 0 == oddness %}selected="selected"{% endif %}>
+                EVEN WEEKS
+            </option>
+            {% for weekNumber in 1..13 %}
+            <option value="{{ weekNumber }}" {% if weekNumber == oddness %}selected="selected"{% endif %}>
+                Week {{ weekNumber }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Submit</button>
+</form>
+
+{% if error != '' %}
+    <div class="error-message">{{ error }}</div>
+{% endif %}
+
+
+<div class="schedule">
+    <div class="hour-block"></div> <!-- Empty cell at the top-left corner -->
+    {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+        <div class="day-title">{{ day }}</div>
+    {% endfor %}
+    {% for hour in 7..20 %}
+        <div class="hour-block">
+            <strong>{{ hour }}:00 - {{ hour + 1 }}:00</strong>
+        </div>
+        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'] %}
+            {% set activity = activities[day][hour] ?? null %}
+            <div class="hour-block">
+                {% if activity %}
+                    {% for act in activities[day][hour] %}
+                        <a href="/schedule/remove_activity/{{ act.id }}">UNSCHEDULE</a> <br>
+                        Name: {{ act.name }}<br>
+                        Rooms:
+                        {% for room in act.rooms %}
+                            {{ room.name }}
+                        {% endfor %}
+                    {% endfor %}
+                    <br>        
+                {% else %}
+                    <form action="{{ path('select_activity_make_schedule') }}" method="POST">
+                        <label for="activitySelect">Add activity:</label>
+                        <select id="activitySelect" name="selected_activity">
+                            {% for act in activities_without_windows %}
+                                <option value="{{ act.id }}, {{ day }}, {{ hour }}">
+                                    Activity: {{ act.name }} Length: {{ act.length }}h
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">Submit</button>
+                    </form>       
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+{% endblock %}

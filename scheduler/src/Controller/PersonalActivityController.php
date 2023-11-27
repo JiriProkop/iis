@@ -57,18 +57,50 @@ class PersonalActivityController extends AbstractController
         return $first_date->add(new \DateInterval(constants::DAY_STR_FORMAT_INTERVALS['Sun']));
     }
 
-    #[Route('/person/teacher/activity/create', name: 'app_personal_activity_create')]
+    private static function cutDateFromDatetime(\DateTimeInterface $date): \DateTime
+    {
+        return new \DateTime($date->format('Y-m-d'));
+    }
+
+    private static function cutHourFromDatetime(\DateTimeInterface $date): \DateTime
+    {
+        $hour = new \DateTime();
+        return $hour->createFromFormat('G', $date->format('G'));
+    }
+
+    #[Route('/person/teacher/activity/delete/{id}', name: 'personal_activity_delete', methods: ['GET', 'DELETE'])]
+    public function delete($id): Response
+    {
+        $person = $this->getUser();
+        if($person !== null) {
+            if ($person->getRoles()[0] === 'ROLE_TEACHER') {
+                $personal_activity = $this->personalActivityRepository->find($id);
+                if ($personal_activity !== null) {
+                    $Windows = $this->scheduleWindowRepository->findBy(['PersonalActivity' => $personal_activity]);
+                    foreach ($Windows as $window) {
+                        $this->em->remove($window);
+                    }
+                    $this->em->remove($personal_activity);
+                    $this->em->flush();
+                }
+                return $this->redirectToRoute('personal_activity');
+            }
+            return $this->render('personal_activity/AccessDenied.html.twig');
+        }
+        return $this->redirectToRoute('app_login');
+    }
+
+    #[Route('/person/teacher/activity/create', name: 'personal_activity_create')]
     public function create(Request $request): Response
     {
         $person = $this->getUser();
-        if($person != null) {
+        if($person !== null) {
             if($person->getRoles()[0] === 'ROLE_TEACHER') {
                 $form = $this->createForm(PersonalActivityFormType::class);
 
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
                     $personal_activity = new PersonalActivityEntity();
-                    $Window = new ScheduleWindowEntity();
 
                     $from = $form->get('Time_from')->getData();
                     $to = $form->get('Time_to')->getData();
@@ -86,10 +118,10 @@ class PersonalActivityController extends AbstractController
                     $length = $to->format('G');
                     $length -= $from->format('G');
                     $personal_activity->setLength($length);
-                    $str_room = $form->get('Room')->getData();
+                    $room_id = $form->get('Room')->getData();
                     // validation of room exists
-                    if($str_room !== '' && $str_room !== null) {
-                        $room = $this->roomRepository->findOneBy(['Name' => $str_room]);
+                    if($room_id !== 'none' && $room_id !== null) {
+                        $room = $this->roomRepository->find($room_id);
                         if ($room === null) {
                             return $this->render('personal_activity/create.html.twig', [
                                 'form' => $form->createView(),
@@ -103,29 +135,35 @@ class PersonalActivityController extends AbstractController
                         $repetition = constants::REPETITIONS['none'];
                     $personal_activity->setRepetition($repetition);
 
-                    // create window //todo multiple windows
                     $date = $form->get('Date')->getData();
                     $date->add(constants::getHourInterval($from->format('G')));
-                    echo $date->format(' Y-m-d H');
-                    $Window->setPersonalActivity($personal_activity);
-                    $Window->setStart($date);
                     $end_date = clone $date;
                     $end_date->add(constants::getHourInterval($length));
-                    echo $date->format(' Y-m-d H');
-                    $Window->setEnd($end_date);
+                    $weeks_left = constants::getWeeksLeft($repetition, $date);
 
+                    for($i = 0; $i < $weeks_left; $i++) {
+                        if((constants::isEvenWeek($date) && $repetition === 'even')
+                            || (!constants::isEvenWeek($date) && $repetition === 'odd')
+                            || $repetition === 'weekly'
+                            || $repetition === 'none') {
+                            $Window = new ScheduleWindowEntity();
+                            $Window->setPersonalActivity($personal_activity);
+                            $Window->setStart(clone $date);
+                            $Window->setEnd(clone $end_date);
+                            $this->em->persist($Window);
+                        }
+                        $date->add(constants::getWeekIntervalFromInt(1));
+                        $end_date->add(constants::getWeekIntervalFromInt(1));
+                    }
                     $this->em->persist($personal_activity);
-                    $this->em->persist($Window);
                     $this->em->flush();
 
                     return $this->redirectToRoute('personal_activity');
-
                 }
                 return $this->render('personal_activity/create.html.twig', [
                     'form' => $form->createView(),
                     'warning' => ''
                 ]);
-
             }
             return $this->render('personal_activity/AccessDenied.html.twig');
         }
