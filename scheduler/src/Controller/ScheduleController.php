@@ -42,9 +42,19 @@ class ScheduleController extends AbstractController
     {
         $personalActivities = $this->personRepository->find($id)->getPersonalActivities();
         $classActivities = $this->personRepository->find($id)->getClassActivities();
+        $classees = $this->personRepository->find($id)->getClasses();
+
+        $tmp = [];
+        foreach ($classees as $classe) {
+            foreach ($classe->getActivities() as $activity) {
+                array_push($tmp, $activity);
+            }
+        }
+
         $res = [];
         $selectedWeek = $session->get('selected_week', 1);
 
+        $res = $this->fill_with_activities($res, $tmp, $session);
         $res = $this->fill_with_activities($res, $personalActivities, $session);
         $res = $this->fill_with_activities($res, $classActivities, $session);
         return $this->render('schedule/index.html.twig', [
@@ -141,8 +151,9 @@ class ScheduleController extends AbstractController
         }
 
         $error = $session->get('error_msg', '');
-        var_dump($session->get('collision_cause_href', ""));
 
+
+        
         return $this->render('schedule/create.html.twig', [
             'activities' => $res,
             'activities_without_windows' => $unscheduled,
@@ -159,7 +170,7 @@ class ScheduleController extends AbstractController
         $res = [];
         foreach ($activities as $activity) {
             if (count($activity->getScheduledWindows()) == 0) {
-                $res[] = $activity;
+                array_push($res, $activity);
             }
         }
         return $res;
@@ -187,8 +198,6 @@ class ScheduleController extends AbstractController
         $day = trim($data[1]);
         $hour = trim($data[2]);
 
-        var_dump($act_id);
-        var_dump($day);
         $activity = $this->classActivityRepository->find($act_id);
 
 
@@ -372,11 +381,13 @@ class ScheduleController extends AbstractController
                     $res[$day][$hour] = [];
                 }
                 for ($i = 0; $i < $activity->getLength(); $i++) {
-                    $res[$day][$hour][$activity->getId()] = [
-                        'id' => $activity->getId(),
-                        'name' => $activity->getName(),
-                        'rooms' => $activity->getRooms(),
-                    ];
+                    if (!isset($res[$day][$hour])) {
+                        $res[$day][$hour] = [
+                            'id' => $activity->getId(),
+                            'name' => $activity->getName(),
+                            'rooms' => $activity->getRooms(),
+                        ];
+                    } 
                     $hour += 1;
                 }
             }
