@@ -62,7 +62,7 @@ class ClassController extends AbstractController
         $class = $this->classRepository->find($id);
 
         $guarantees = false;
-        if (in_array('ROLE_ADMIN', $user->getRoles()) || ($user != null && $class->getGuarantor()->getId() == $user->getId())) {
+        if ($user != null && in_array('ROLE_ADMIN', $user->getRoles()) || ($user != null && $class->getGuarantor()->getId() == $user->getId())) {
             $guarantees = true;
         }
 

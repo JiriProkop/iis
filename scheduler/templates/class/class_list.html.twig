@@ -17,15 +17,13 @@
     <ul>
         {% for class in classes %}
             <li>
-                <b>ID:</b> {{ class.id }} <b>Abbreviation:</b> {{ class.abbreviation }} <b>Name:</b> {{ class.name }} <b>Credits:</b> {{ class.credits }}
+                <b>{{ class.abbreviation }}</b> - {{ class.name }} - <b>Credits:</b> {{ class.credits }}
                 {% if role == 'ROLE_ADMIN' %}
                     <a href="/class/{{ class.id }}/edit">EDIT</a> -
                     <a href="/class/{{ class.id }}/delete">DELETE</a> -
                     <a href="/class/{{ class.id }}/add_people">ADD PEOPLE</a> -
                 {% endif %}
-                {% if role == 'ROLE_ADMIN' or role == 'ROLE_GUARANTOR' %}
-                    <a href="/class/{{ class.id }}/activities">ACTIVITIES</a> -
-                {% endif %}
+                    <a href="/class/{{ class.id }}/detail">DETAIL</a>
                 {% if role == 'ROLE_STUDENT' %}
                     <a href="/class/{{ class.id }}/register">REGISTER</a>
                 {% endif %}
