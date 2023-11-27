@@ -51,7 +51,8 @@
             {% set activity = activities[day][hour] ?? null %}
             <div class="hour-block">
                 {% if activity %}
-                    {{ activity.name }}<br>
+                    Name: {{ activity.name }}<br>
+                    Teacher: {{ act.teacher }}<br>
                     Rooms:
                     {% for room in activity.rooms %}
                         {{ room.name }}
