@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Person Info{% endblock %}
+
+{% block body %}
+    {% if person is null %}
+        Login to view this page!
+    {% else %}
+        <h4>Login: {{ person.login }}</h4>
+        <h4>Email: {{ person.email }}</h4>
+        <a href="/person/{{ person.id }}/edit">EDIT</a>
+    {% endif %}
+{% endblock %}

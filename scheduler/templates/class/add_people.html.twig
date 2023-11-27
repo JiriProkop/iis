@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create Class{% endblock %}
+{% block title %}Add People to Class{% endblock %}
 
 {% block body %}
     {% if guarantors is not null %}
-        <h2>Garant:</h2>
+        <h2>Guarantor:</h2>
         {% if class.guarantor is not null %}
-            <h3>{{ class.guarantor.login }} - <a href="/class/{{ class.id }}/remove_guarantor/">REMOVE</a></h3>
+            {{ class.guarantor.login }} - <a href="/class/{{ class.id }}/remove_guarantor/">REMOVE</a>
         {% endif %}
         <ul>
             {% for g in guarantors %}
@@ -14,18 +14,19 @@
             {% endfor %}
         </ul>
     {% endif %}
-        <h2>Vyucujici:</h2>
-        <ul>
-            {% for t in class.people %}
-                <li>{{ t.login }} - <a href="/class/{{ class.id }}/remove_teacher/{{ t.id }}">REMOVE</a></li>
-            {% endfor %}
-        </ul>
-        <h3>Pridat vyucujiciho:</h3>
-        <ul>
-            {% for t in teachers %}
-                <li>{{ t.login }} - <a href="/class/{{ class.id }}/add_teacher/{{ t.id }}">ADD</a></li>
-            {% endfor %}
-        </ul>
 
-    <a href="/class/admin">DONE</a>
+    <h2>Vyucujici:</h2>
+    <ul>
+        {% for t in class.people %}
+            <li>{{ t.login }} - <a href="/class/{{ class.id }}/remove_teacher/{{ t.id }}">REMOVE</a></li>
+        {% endfor %}
+    </ul>
+    <h3>Pridat vyucujiciho:</h3>
+    <ul>
+        {% for t in teachers %}
+            <li>{{ t.login }} - <a href="/class/{{ class.id }}/add_teacher/{{ t.id }}">ADD</a></li>
+        {% endfor %}
+    </ul>
+
+    <a href="/class">DONE</a>
 {% endblock %}

@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\constants;
 use App\Entity\ScheduleWindowEntity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -20,7 +21,7 @@ class RepeatingScheduleFormType extends AbstractType
                 'mapped' => false
             ])
             ->add('Day', ChoiceType::class, [
-                'choices' => ["Mon" => "Mon", "Tue" => "Tue", "Wed" => "Wed", "Thu" => "Thu", "Fri" => "Fri", "Sat" => "Sat", "Sun" => "Sun"],
+                'choices' => constants::DAY_STR_FORMAT_INTERVALS,
                 'mapped' => false
             ]);
     }

@@ -61,7 +61,7 @@ class RoomController extends AbstractController
             return $this->redirectToRoute('admin_rooms_list');
         }
 
-        return $this->render('person/create.html.twig', [
+        return $this->render('person_create.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -76,7 +76,7 @@ class RoomController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $room_name = $form->get('Name')->getData();
             $room_type = $form->get('Type')->getData();
-            
+           
             $room->setName($room_name);
             $room->setType($room_type);
 

@@ -17,30 +17,54 @@ class ClassController extends AbstractController
     private ClassEntityRepository $classRepository;
     private PersonEntityRepository $personRepository;
     private EntityManagerInterface $em;
-    public function __construct(ClassEntityRepository $classEntityRepository, PersonEntityRepository $personRepository, EntityManagerInterface $em) {
-        $this->classRepository = $classEntityRepository;
+    public function __construct(ClassEntityRepository $classRepository, PersonEntityRepository $personRepository, EntityManagerInterface $em) {
+        $this->classRepository = $classRepository;
         $this->personRepository = $personRepository;
         $this->em = $em;
     }
 
-    #[Route('/class/admin/create', name: 'admin_class_create')]
-    public function create(Request $request): Response
+    #[Route('/class', name: 'class')]
+    public function class(): Response
+    {
+        $user = $this->getUser();
+        if ($user != null) {
+            $role = $user->getRoles()[0];
+        } else {
+            $role = 'ROLE_ELSE';
+        }
+
+        $classes = $this->classRepository->findAll();
+
+        return $this->render('class/class_list.html.twig', [
+            'classes' => $classes,
+            'role' => $role,
+        ]);
+    }
+
+    #[Route('/class/create', name: 'class_create')]
+    public function class_create(Request $request): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        $class = new ClassEntity();
-        $form = $this->createForm(ClassFormType::class, $class);
+        $newClass = new ClassEntity();
+        $form = $this->createForm(ClassFormType::class, $newClass);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // TODO validace dat zde $form->get('...');
-
-            $newClass = new ClassEntity();
-
+            // set things without need for validation
             $newClass->setAbbreviation($form->get('Abbreviation')->getData());
-            $newClass->setName($form->get('Name')->getData());
             $newClass->setAnotation($form->get('Anotation')->getData());
-            $newClass->setCredits($form->get('Credits')->getData());
+            $newClass->setName($form->get('Name')->getData());
+
+            // check credit count
+            if ($form->get('Credits')->getData() > 0) {
+                $newClass->setCredits($form->get('Credits')->getData());
+            } else {
+                return $this->render('class/class_create.html.twig', [
+                    'error' => 'Credit count must be greater than 0!',
+                    'form' => $form->createView(),
+                ]);
+            }
 
             $this->em->persist($newClass);
             $this->em->flush();
@@ -48,66 +72,37 @@ class ClassController extends AbstractController
             return $this->redirectToRoute('class_add_people', ['id' => $newClass->getId()]);
         }
 
-        return $this->render('person/create.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
-    #[Route('/class/edit/{id}', name: 'class_edit')]
-    public function personal_edit(Request $request, $id): Response
-    {
-        $class = $this->classRepository->find($id);
-        $form = $this->createForm(ClassFormType::class, $class);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            // TODO validace dat zde $form->get('...');
-
-            $class->setAbbreviation($form->get('Abbreviation')->getData());
-            $class->setName($form->get('Name')->getData());
-            $class->setAnotation($form->get('Anotation')->getData());
-            $class->setCredits($form->get('Credits')->getData());
-
-            $this->em->flush();
-            return $this->redirectToRoute('class');
-        }
-
-        return $this->render('class/edit.html.twig', [
-            'class' => $class,
+        return $this->render('class/class_create.html.twig', [
+            'error' => null,
             'form' => $form->createView(),
         ]);
     }
 
     #[Route('/class/{id}/add_people', name: 'class_add_people')]
-    public function add_people($id): Response
+    public function class_add_people($id): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $class = $this->classRepository->find($id);
 
-        $user = $this->getUser();
+        // get array of possible guarantors
+        $guarantors = array();
 
-        $guarantors = null;
-
-        if (in_array('ROLE_ADMIN', $user->getRoles())) {
-            $guarantors = array();
-
-            $potential_guarantors = $this->personRepository->findAll();
-            foreach ($potential_guarantors as $pg) {
-                if (in_array('ROLE_GUARANTOR', $pg->getRoles())) {
-                    $guarantors[] = $pg;
-                }
+        $potential_guarantors = $this->personRepository->findAll();
+        foreach ($potential_guarantors as $pg) {
+            if (in_array('ROLE_GUARANTOR', $pg->getRoles())) {
+                $guarantors[] = $pg;
             }
         }
 
-        // TODO vyfiltrovat jen ucitele pro zobrazeni
-
+        // get array of possible teachers
         $teachers = array();
         $potential_teachers = $this->personRepository->findAll();
         foreach ($potential_teachers as $pt) {
-            if (in_array('ROLE_TEACHER', $pt->getRoles())) {
+            if (in_array('ROLE_TEACHER', $pt->getRoles()) && !in_array($pt, $class->getPeople()->getValues())) {
                 $teachers[] = $pt;
             }
         }
-
 
         return $this->render('class/add_people.html.twig', [
             'class' => $class,
@@ -116,44 +111,31 @@ class ClassController extends AbstractController
         ]);
     }
 
-    #[Route('/class/{id}/remove_guarantor', name: 'class_remove_guarantor')]
-    public function remove_guarantor($id): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $class= $this->classRepository->find($id);
-
-        $class->setGuarantor(null);
-
-        $this->em->flush();
-
-        return $this->redirectToRoute('class_add_people', ['id' => $class->getId()]);
-    }
-
     #[Route('/class/{id_class}/set_guarantor/{id_person}', name: 'class_set_guarantor')]
-    public function set_guarantor($id_class, $id_person): Response
+    public function class_set_guarantor($id_class, $id_person): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $class= $this->classRepository->find($id_class);
 
-        $class->setGuarantor($this->personRepository->find($id_person));
+        $class= $this->classRepository->find($id_class);
+        $guarantor = $this->personRepository->find($id_person);
+
+        if ($class != null && $guarantor != null) {
+            $class->setGuarantor($guarantor);
+        }
 
         $this->em->flush();
 
         return $this->redirectToRoute('class_add_people', ['id' => $class->getId()]);
     }
 
-    #[Route('/class/{id_class}/remove_teacher/{id_person}', name: 'class_remove_teacher')]
-    public function remove_teacher($id_class, $id_person): Response
+    #[Route('/class/{id}/remove_guarantor', name: 'class_remove_guarantor')]
+    public function class_remove_guarantor($id): Response
     {
-        $class = $this->classRepository->find($id_class);
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        $people = $class->getPeople();
-
-        foreach ($people as $p) {
-            if ($p->getId() == $id_person) {
-                $people->removeElement($p);
-                break;
-            }
+        $class= $this->classRepository->find($id);
+        if ($class != null) {
+            $class->setGuarantor(null);
         }
 
         $this->em->flush();
@@ -162,36 +144,88 @@ class ClassController extends AbstractController
     }
 
     #[Route('/class/{id_class}/add_teacher/{id_person}', name: 'class_add_teacher')]
-    public function add_teacher($id_class, $id_person): Response
+    public function class_add_teacher($id_class, $id_person): Response
     {
-        $class = $this->classRepository->find($id_class);
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        $people = $class->getPeople();
+        $class = $this->classRepository->find($id_class);
         $person = $this->personRepository->find($id_person);
 
-        $people[] = $person;
+        if ($class != null && $person != null) {
+            $people = $class->getPeople();
+            $people[] = $person;
+        }
 
         $this->em->flush();
 
         return $this->redirectToRoute('class_add_people', ['id' => $class->getId()]);
     }
 
-    #[Route('/class/admin', name: 'class')]
-    public function index_admin(): Response
+    #[Route('/class/{id_class}/remove_teacher/{id_person}', name: 'class_remove_teacher')]
+    public function class_remove_teacher($id_class, $id_person): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        $classes = $this->classRepository->findAll();
+        $class = $this->classRepository->find($id_class);
 
-        return $this->render('class/index.html.twig', [
-            'classes' => $classes,
+        if ($class != null) {
+            $people = $class->getPeople();
+            foreach ($people as $p) {
+                if ($p->getId() == $id_person) {
+                    $people->removeElement($p);
+                    break;
+                }
+            }
+        }
+
+        $this->em->flush();
+
+        return $this->redirectToRoute('class_add_people', ['id' => $class->getId()]);
+    }
+
+    #[Route('/class/{id}/edit', name: 'class_edit')]
+    public function class_edit($id, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $class = $this->classRepository->find($id);
+        $form = $this->createForm(ClassFormType::class, $class);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // set things without need for validation
+            $class->setAbbreviation($form->get('Abbreviation')->getData());
+            $class->setAnotation($form->get('Anotation')->getData());
+            $class->setName($form->get('Name')->getData());
+
+            // check credit count
+            if ($form->get('Credits')->getData() > 0) {
+                $class->setCredits($form->get('Credits')->getData());
+            } else {
+                return $this->render('class/class_edit.html.twig', [
+                    'error' => 'Credit count must be greater than 0!',
+                    'class' => $class,
+                    'form' => $form->createView(),
+                ]);
+            }
+
+            $this->em->flush();
+            return $this->redirectToRoute('class');
+        }
+
+        return $this->render('class/class_edit.html.twig', [
+            'error' => null,
+            'class' => $class,
+            'form' => $form->createView(),
         ]);
     }
 
-    #[Route('/class/admin/delete/{id}', name: 'class_delete')]
-    public function delete_class($id): Response
+
+    #[Route('/class/{id}/delete/', name: 'class_delete')]
+    public function class_delete($id): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $class= $this->classRepository->find($id);
 
         $this->em->remove($class);

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List of People{% endblock %}
+
+{% block body %}
+    <a href="/person/create">Create new person</a>
+    <ul>
+        {% for person in people %}
+        <li>
+            <b>ID:</b> {{ person.id }} <b>Login:</b> {{ person.login }} <b>Email:</b> {{ person.email }} <b>Roles:</b>
+            {% for role in person.roles %} {{ role }} - {% endfor %}
+            <a href="/person/{{ person.id }}/edit">EDIT</a> -
+            <a href="/person/{{ person.id }}/delete">DELETE</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
