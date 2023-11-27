@@ -38,11 +38,12 @@ class PersonalActivityFormType extends AbstractType
                 'required' => false,
                 'multiple' => false,
                 'choices'  => $room_names,
-                'mapped' => false
+                'mapped' => false,
             ])
             ->add('Date', DateType::class, [
                 'widget' => 'choice',
-                'mapped' => false
+                'mapped' => false,
+                'label' => 'Date *'
             ])
             ->add('Time_from', TimeType::class, [
                 'widget' => 'choice',
@@ -50,7 +51,8 @@ class PersonalActivityFormType extends AbstractType
                 'placeholder' => [
                     'hour' => 'Hour',
                 ],
-                'mapped' => false
+                'mapped' => false,
+                'label' => 'Time from *'
             ])
             ->add('Time_to', TimeType::class, [
                 'widget' => 'choice',
@@ -58,7 +60,8 @@ class PersonalActivityFormType extends AbstractType
                 'placeholder' => [
                     'hour' => 'Hour',
                 ],
-                'mapped' => false
+                'mapped' => false,
+                'label' => 'Time to *'
             ])
             ->add('Repetition',ChoiceType::class, [
                 'choices' => constants::REPETITIONS,

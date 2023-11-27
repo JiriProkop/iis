@@ -10,7 +10,6 @@
         <li>
             {{ activity.id }} - {{ activity.Description }} - {{ activity.Repetition }} - {{ activity.Length }} {% if activity.Room is not null %} - {{ activity.Room.Name}} {% endif %} - aktivita:
             <a href="/person/teacher/activity/delete/{{ activity.id }}">DELETE</a>
-            <a href="/person/teacher/activity/edit/{{ activity.id }}">EDIT</a>
         </li>
         <ul>
             {% for window in windows[activity.id] %}
