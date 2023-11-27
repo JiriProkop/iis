@@ -26,6 +26,12 @@
                 {% if 'ROLE_STUDENT' in app.user.roles or 'ROLE_SCHEDULER' in app.user.roles %}
                     <a href="/make_schedule">CREATE SCHEDULE</a>
                 {% endif %}
+                {% if 'ROLE_ADMIN' in app.user.roles %}
+                    <a href="/room/admin/list">ROOMS</a>
+                {% endif %}
+                {% if 'ROLE_ADMIN' in app.user.roles or 'ROLE_SCHEDULER' in app.user.roles %}
+                    <a href="/person/list">TEACHER-SCHEDULES</a>
+                {% endif %}
             {% else %}
                 <div class="user-banner">
                     You are viewing as a guest.
