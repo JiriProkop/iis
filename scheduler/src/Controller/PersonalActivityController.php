@@ -102,7 +102,6 @@ class PersonalActivityController extends AbstractController
                         $repetition = constants::REPETITIONS['none'];
                     $personal_activity->setRepetition($repetition);
 
-                    // create window //todo multiple windows
                     $date = $form->get('Date')->getData();
                     $date->add(constants::getHourInterval($from->format('G')));
                     $end_date = clone $date;
@@ -122,7 +121,6 @@ class PersonalActivityController extends AbstractController
                         }
                         $date->add(constants::getWeekInterval(1));
                         $end_date->add(constants::getWeekInterval(1));
-                        echo 'times'.$i;
                     }
                     $this->em->persist($personal_activity);
                     $this->em->flush();
