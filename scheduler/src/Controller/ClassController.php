@@ -35,10 +35,61 @@ class ClassController extends AbstractController
 
         $classes = $this->classRepository->findAll();
 
+        $registered = null;
+        $credits = 0;
+        if ($role == 'ROLE_STUDENT') {
+            $registered = $user->getClasses();
+            foreach ($registered as $r) {
+                $credits += $r->getCredits();
+                // the already registered class will appear only once
+                unset($classes[array_search($r, $classes)]);
+            }
+        }
+
         return $this->render('class/class_list.html.twig', [
+            'registered' => $registered,
+            'credits' => $credits,
             'classes' => $classes,
             'role' => $role,
         ]);
+    }
+
+    #[Route('/class/{id}/register', name: 'class_register')]
+    public function class_register($id): Response
+    {
+        $user = $this->getUser();
+        if ($user == null || !in_array('ROLE_STUDENT', $user->getRoles())) {
+            return $this->redirectToRoute('class');
+        }
+
+        $class = $this->classRepository->find($id);
+
+        if ($class != null) {
+            $user->addClass($class);
+        }
+
+        $this->em->flush();
+
+        return $this->redirectToRoute('class');
+    }
+
+    #[Route('/class/{id}/unregister', name: 'class_unregister')]
+    public function class_unregister($id): Response
+    {
+        $user = $this->getUser();
+        if ($user == null || !in_array('ROLE_STUDENT', $user->getRoles())) {
+            return $this->redirectToRoute('class');
+        }
+
+        $class = $this->classRepository->find($id);
+
+        if ($class != null && in_array($class, $user->getClasses()->toArray())) {
+            $user->removeClass($class);
+        }
+
+        $this->em->flush();
+
+        return $this->redirectToRoute('class');
     }
 
     #[Route('/class/create', name: 'class_create')]

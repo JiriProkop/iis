@@ -191,9 +191,6 @@ class ClassActivityController extends AbstractController
         }
 
         $schedule = new ScheduleWindowEntity();
-        if ($activity->getScheduledWindows() != null && $activity->getScheduledWindows()->get(0) != null) {
-            $schedule = $activity->getScheduledWindows()->get(0);
-        }
 
         if ($activity->getRepetition() == 'ONE_TIME') {
             $form = $this->createForm(OneTimeScheduleFormType::class, $schedule);

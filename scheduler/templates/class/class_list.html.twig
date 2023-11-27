@@ -3,7 +3,17 @@
 {% block title %}Classes{% endblock %}
 
 {% block body %}
-    <a href="/class/create">Create class</a>
+    {% if role == 'ROLE_ADMIN' %}
+        <a href="/class/create">Create class</a>
+    {% endif %}
+    {% if role == 'ROLE_STUDENT' %}
+        {% if credits is not null %}<b>Credits registered:</b> {{ credits }}{% endif %}
+        <ul>
+            {% for r in registered %}
+                <li>{{ r.name }} <a href="/class/{{ r.id }}/unregister">UNREGISTER</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <ul>
         {% for class in classes %}
             <li>
@@ -16,7 +26,7 @@
                 {% if role == 'ROLE_ADMIN' or role == 'ROLE_GUARANTOR' %}
                     <a href="/class/{{ class.id }}/activities">ACTIVITIES</a> -
                 {% endif %}
-                {% if role == 'ROLE_ADMIN' or role == 'ROLE_STUDENT' %}
+                {% if role == 'ROLE_STUDENT' %}
                     <a href="/class/{{ class.id }}/register">REGISTER</a>
                 {% endif %}
             </li>
