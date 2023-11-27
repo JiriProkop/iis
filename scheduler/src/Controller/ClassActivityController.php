@@ -194,8 +194,8 @@ class ClassActivityController extends AbstractController
                 $start->modify("+$length hour");
                 $newSchedule->setEnd(new \DateTime($start->format('Y-m-d H:i:s')));
 
-                $this->em->persist($schedule);
-                $activity->addScheduledWindow($schedule);
+                $this->em->persist($newSchedule);
+                $activity->addScheduledWindow($newSchedule);
             } else {
                 // if the activity is repeating:
 
@@ -224,17 +224,19 @@ class ClassActivityController extends AbstractController
                 for ($i = 0; $i < $times; $i++) {
                     $newSchedule = new ScheduleWindowEntity();
                     // set start
-                    $newSchedule->setStart(new \DateTime($datetime->format('Y-m-d H:i:s')));
+                    $start = new \DateTime($datetime->format('Y-m-d H:i:s'));
+                    $newSchedule->setStart($start);
                     // set end
                     $length = $activity->getLength();
                     $datetime->modify("+$length hour");
-                    $newSchedule->setEnd(new \DateTime($datetime->format('Y-m-d H:i:s')));
+                    $end = new \DateTime($datetime->format('Y-m-d H:i:s'));
+                    $newSchedule->setEnd($end);
 
                     // modify the start time back
                     $datetime->modify("-$length hour");
 
-                    $this->em->persist($schedule);
-                    $activity->addScheduledWindow($schedule);
+                    $this->em->persist($newSchedule);
+                    $activity->addScheduledWindow($newSchedule);
 
                     // go to next week
                     $datetime->add(constants::getWeekInterval());
@@ -250,6 +252,7 @@ class ClassActivityController extends AbstractController
         }
 
         return $this->render('class_activity/activity_schedule.html.twig', [
+            'error' => null,
             'schedule' => $schedule,
             'form' => $form->createView(),
         ]);
