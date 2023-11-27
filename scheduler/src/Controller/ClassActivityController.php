@@ -10,6 +10,7 @@ use App\Form\OneTimeScheduleFormType;
 use App\Form\RepeatingScheduleFormType;
 use App\Repository\ClassActivityEntityRepository;
 use App\Repository\ClassEntityRepository;
+use App\Repository\PersonEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,10 +21,12 @@ class ClassActivityController extends AbstractController
 {
     private ClassActivityEntityRepository $activityRepository;
     private ClassEntityRepository $classRepository;
+    private PersonEntityRepository $personRepository;
     private EntityManagerInterface $em;
-    public function __construct(ClassActivityEntityRepository $activityRepository, ClassEntityRepository $classRepository, EntityManagerInterface $em) {
+    public function __construct(ClassActivityEntityRepository $activityRepository, ClassEntityRepository $classRepository, PersonEntityRepository $personRepository, EntityManagerInterface $em) {
         $this->activityRepository = $activityRepository;
         $this->classRepository = $classRepository;
+        $this->personRepository = $personRepository;
         $this->em = $em;
     }
     #[Route('/class/{id}/activities', name: 'class_activities')]
@@ -165,12 +168,25 @@ class ClassActivityController extends AbstractController
         if (!in_array('ROLE_ADMIN', $user->getRoles()) && ($user == null || $class->getGuarantor()->getId() != $user->getId())) {
             return $this->render('class_activity/activity_schedule.html.twig', [
                 'error' => 'You do not have the permissions to schedule this activity!',
+                'activity' => null,
+                'teachers' => null,
+                'schedule' => null,
                 'form' => null,
             ]);
         }
 
-        $schedule = new ScheduleWindowEntity();
         $activity = $this->activityRepository->find($id_activity);
+
+        // get array of possible teachers
+        $teachers = array();
+        $potential_teachers = $class->getPeople();
+        foreach ($potential_teachers as $pt) {
+            if (in_array('ROLE_TEACHER', $pt->getRoles()) && $activity->getTeacher() != $pt) {
+                $teachers[] = $pt;
+            }
+        }
+
+        $schedule = new ScheduleWindowEntity();
         if ($activity->getScheduledWindows() != null && $activity->getScheduledWindows()->get(0) != null) {
             $schedule = $activity->getScheduledWindows()->get(0);
         }
@@ -260,8 +276,57 @@ class ClassActivityController extends AbstractController
 
         return $this->render('class_activity/activity_schedule.html.twig', [
             'error' => null,
+            'activity' => $activity,
+            'teachers' => $teachers,
             'schedule' => $schedule,
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/class/{id_class}/activity/{id_activity}/set_teacher/{id_person}', name: 'activity_set_teacher')]
+    public function activity_set_teacher($id_class, $id_activity, $id_person): Response
+    {
+        $user = $this->getUser();
+        $class = $this->classRepository->find($id_class);
+
+        // check permissions
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && ($user == null || $class->getGuarantor()->getId() != $user->getId())) {
+            return $this->redirectToRoute('activity_schedule', ['id_class' => $id_class, 'id_activity' => $id_activity]);
+        }
+
+        $activity = $this->activityRepository->find($id_activity);
+        $person = $this->personRepository->find($id_person);
+
+        // set the teacher to the activity
+        if ($activity != null && $person != null && in_array($person, $class->getPeople()->toArray())) {
+            $activity->setTeacher($person);
+        }
+
+        $this->em->flush();
+
+        return $this->redirectToRoute('activity_schedule', ['id_class' => $id_class, 'id_activity' => $id_activity]);
+    }
+
+    #[Route('/class/{id_class}/activity/{id_activity}/remove_teacher', name: 'activity_remove_teacher')]
+    public function activity_remove_teacher($id_class, $id_activity): Response
+    {
+        $user = $this->getUser();
+        $class = $this->classRepository->find($id_class);
+
+        // check permissions
+        if (!in_array('ROLE_ADMIN', $user->getRoles()) && ($user == null || $class->getGuarantor()->getId() != $user->getId())) {
+            return $this->redirectToRoute('activity_schedule', ['id_class' => $id_class, 'id_activity' => $id_activity]);
+        }
+
+        $activity = $this->activityRepository->find($id_activity);
+
+        // remove the teacher from activity
+        if ($activity != null) {
+            $activity->setTeacher(null);
+        }
+
+        $this->em->flush();
+
+        return $this->redirectToRoute('activity_schedule', ['id_class' => $id_class, 'id_activity' => $id_activity]);
     }
 }

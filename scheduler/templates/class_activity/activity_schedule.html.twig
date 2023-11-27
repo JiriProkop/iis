@@ -7,6 +7,15 @@
         {{ error }}
     {% endif %}
 
+    {% if activity is not null %}
+        <h3>Teacher: {% if activity.teacher is not null %}{{ activity.teacher.login }} <a href="remove_teacher">REMOVE</a>{% endif %}</h3>
+        <ul>
+            {% for teacher in teachers %}
+                <li>{{ teacher.login }} - <a href="set_teacher/{{ teacher.id }}">SET TEACHER</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     {%  if form is not null %}
         {{ form_start(form) }}
         {{ form_widget(form) }}
