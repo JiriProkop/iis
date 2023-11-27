@@ -70,7 +70,6 @@ class ScheduleController extends AbstractController
     #[Route('/make_schedule', name: 'make_schedule')]
     public function make_schedule(SessionInterface $session): Response
     {
-        // TODO checks collisions, href the cause with error text
         $all_rooms = $this->roomRepository->findAll();
         $selected_room = $session->get('selected_room', $all_rooms[0]->getName());
         $session->set('selected_room', $selected_room); // some value need to be set in session
@@ -142,6 +141,7 @@ class ScheduleController extends AbstractController
         }
 
         $error = $session->get('error_msg', '');
+        var_dump($session->get('collision_cause_href', ""));
 
         return $this->render('schedule/create.html.twig', [
             'activities' => $res,
@@ -150,6 +150,7 @@ class ScheduleController extends AbstractController
             'oddness' => $odd,
             'rooms' => $rooms_info,
             'error' => $error,
+            // 'error_href' => $session->get('collision_cause_href', ""),
         ]);
     }
 
@@ -184,7 +185,7 @@ class ScheduleController extends AbstractController
         $data = str_getcsv($data, ',');
         $act_id = (int) $data[0];
         $day = trim($data[1]);
-        $hour = $data[2];
+        $hour = trim($data[2]);
 
         var_dump($act_id);
         var_dump($day);
@@ -201,17 +202,17 @@ class ScheduleController extends AbstractController
             $datetime->add(new \DateInterval('P' . ($user_selected_week - 1) . 'W'));
             $day = constants::DAY_STR_FORMAT_INTERVALS[substr($day, 0, 3)];
             $datetime->add(new \DateInterval($day));
+            $datetime->add(new \DateInterval('PT' . $hour . 'H'));
 
-
-            $start = \DateTime::createFromFormat('Y-m-d H:i:s', "2024-02-$day $hour:00:00");
+            $start = $datetime;
             $newSchedule->setStart(new \DateTime($start->format('Y-m-d H:i:s')));
             // set end
             $length = $activity->getLength();
             $start->modify("+$length hour");
             $newSchedule->setEnd(new \DateTime($start->format('Y-m-d H:i:s')));
 
-            if (!$this->check_collisions($newSchedule, $activity)) {
-                $error = 'collision!!!!!!!!!!!!!!!!';
+            if (!$this->check_collisions($newSchedule, $activity, $session)) {
+                $error = $session->get('collision_cause', "Collision!");
                 $session->set('error_msg', $error);
                 return $this->redirectToRoute('make_schedule');
             }
@@ -257,8 +258,8 @@ class ScheduleController extends AbstractController
                 // modify the start time back
                 $datetime->modify("-$length hour");
 
-                if (!$this->check_collisions($newSchedule, $activity)) {
-                    $error = 'collision!!!!!!!!!!!!!!!!';
+                if (!$this->check_collisions($newSchedule, $activity, $session)) {
+                    $error = $session->get('collision_cause', "Collision!");
                     $session->set('error_msg', $error);
                     return $this->redirectToRoute('make_schedule');
                 }
@@ -281,7 +282,7 @@ class ScheduleController extends AbstractController
         return $this->redirectToRoute('make_schedule');
     }
 
-    private function check_collisions($new_window, $activity): bool
+    private function check_collisions($new_window, $activity, $session): bool
     {
         $all_windows = $this->scheduleWindowRepository->findAll();
         $new_length = $activity->getLength();
@@ -297,6 +298,15 @@ class ScheduleController extends AbstractController
             $window_end->add(new \DateInterval('PT' . $length . 'H'));
 
             if ($window->getStart() < $new_window_end && $window_end > $new_window->getStart()) {
+                $user = $window->getClassActivity()->getTeacher();
+                if($user == null){
+                    $href = '';
+                    $session->set('collision_cause_href', $href);
+                }else{
+                    $href = "<a href='/my_schedule/". $user->getId() . "'>COLLIDING SCHEDULE</a>";
+                    $session->set('collision_cause_href', $href);
+                }
+                $session->set('collision_cause', "Collision with activity: " . $window->getClassActivity()->getName() . " ");
                 return false;
             }
         }
@@ -366,7 +376,6 @@ class ScheduleController extends AbstractController
                         'id' => $activity->getId(),
                         'name' => $activity->getName(),
                         'rooms' => $activity->getRooms(),
-                        'teacher' => $activity->getTeacher(),
                     ];
                     $hour += 1;
                 }
