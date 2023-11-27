@@ -14,6 +14,11 @@
                 <li>{{ teacher.login }} - <a href="set_teacher/{{ teacher.id }}">SET TEACHER</a></li>
             {% endfor %}
         </ul>
+
+        <h3>Set your desired time and room (might be changed later by the scheduler).</h3>
+        <h4>Currenly set:</h4>
+        <b>Rooms:</b> {% for room in activity.rooms %} {{ room.name }} {% endfor %}
+        <b>Time:</b> {% if set_time is not null %}{{ set_time }}{% endif %}
     {% endif %}
 
     {%  if form is not null %}

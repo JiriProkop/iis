@@ -11,6 +11,7 @@ use App\Form\RepeatingScheduleFormType;
 use App\Repository\ClassActivityEntityRepository;
 use App\Repository\ClassEntityRepository;
 use App\Repository\PersonEntityRepository;
+use App\Repository\RoomEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,11 +23,13 @@ class ClassActivityController extends AbstractController
     private ClassActivityEntityRepository $activityRepository;
     private ClassEntityRepository $classRepository;
     private PersonEntityRepository $personRepository;
+    private RoomEntityRepository $roomRepository;
     private EntityManagerInterface $em;
-    public function __construct(ClassActivityEntityRepository $activityRepository, ClassEntityRepository $classRepository, PersonEntityRepository $personRepository, EntityManagerInterface $em) {
+    public function __construct(ClassActivityEntityRepository $activityRepository, ClassEntityRepository $classRepository, PersonEntityRepository $personRepository, RoomEntityRepository $roomRepository, EntityManagerInterface $em) {
         $this->activityRepository = $activityRepository;
         $this->classRepository = $classRepository;
         $this->personRepository = $personRepository;
+        $this->roomRepository = $roomRepository;
         $this->em = $em;
     }
     #[Route('/class/{id}/activities', name: 'class_activities')]
@@ -168,6 +171,7 @@ class ClassActivityController extends AbstractController
         if (!in_array('ROLE_ADMIN', $user->getRoles()) && ($user == null || $class->getGuarantor()->getId() != $user->getId())) {
             return $this->render('class_activity/activity_schedule.html.twig', [
                 'error' => 'You do not have the permissions to schedule this activity!',
+                'set_time' => null,
                 'activity' => null,
                 'teachers' => null,
                 'schedule' => null,
@@ -199,6 +203,11 @@ class ClassActivityController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            // set the activity room
+            foreach ($form->get('Rooms')->getData() as $room_id) {
+                $activity->addRoom($this->roomRepository->find($room_id));
+            }
+
             // remove all already scheduled windows
             if ($activity->getScheduledWindows() != null && $activity->getScheduledWindows()->count() > 0) {
                 foreach ($activity->getScheduledWindows() as $sw) {
@@ -274,8 +283,19 @@ class ClassActivityController extends AbstractController
             return $this->redirectToRoute('class_activities', ['id' => $id_class]);
         }
 
+        // get the set time into a string
+        $set_time = 'repetition: ' . $activity->getRepetition();
+        if ($activity->getScheduledWindows() != null) {
+            if ($activity->getRepetition() == 'ONE_TIME') {
+                $set_time = $set_time . ' date: ' . $activity->getScheduledWindows()->get(0)->getStart()->format('Y-m-d H:i');
+            } else {
+                $set_time = $set_time . ' time: ' . $activity->getScheduledWindows()->get(0)->getStart()->format('l H:i');
+            }
+        }
+
         return $this->render('class_activity/activity_schedule.html.twig', [
             'error' => null,
+            'set_time' => $set_time,
             'activity' => $activity,
             'teachers' => $teachers,
             'schedule' => $schedule,
