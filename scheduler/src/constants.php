@@ -23,7 +23,7 @@ class constants
         return new \DateTime(self::STR_FIRST_DAY_OF_SEMESTER);
     }
 
-    public static function getWeekInterval(int $weeks): \DateInterval
+    public static function getWeekIntervalFromInt(int $weeks): \DateInterval
     {
         return new \DateInterval('P'.$weeks.'W');
     }

@@ -152,8 +152,8 @@ class PersonalActivityController extends AbstractController
                             $Window->setEnd(clone $end_date);
                             $this->em->persist($Window);
                         }
-                        $date->add(constants::getWeekInterval(1));
-                        $end_date->add(constants::getWeekInterval(1));
+                        $date->add(constants::getWeekIntervalFromInt(1));
+                        $end_date->add(constants::getWeekIntervalFromInt(1));
                     }
                     $this->em->persist($personal_activity);
                     $this->em->flush();
