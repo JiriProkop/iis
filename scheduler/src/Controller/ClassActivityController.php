@@ -32,28 +32,6 @@ class ClassActivityController extends AbstractController
         $this->roomRepository = $roomRepository;
         $this->em = $em;
     }
-    #[Route('/class/{id}/activities', name: 'class_activities')]
-    public function class_activities($id): Response
-    {
-        $user = $this->getUser();
-        $class = $this->classRepository->find($id);
-
-        $guarantees = false;
-        if (in_array('ROLE_ADMIN', $user->getRoles()) || ($user != null && $class->getGuarantor()->getId() == $user->getId())) {
-            $guarantees = true;
-        }
-
-        $activities = null;
-        if ($class != null) {
-            $activities = $class->getActivities();
-        }
-
-        return $this->render('/class_activity/activity_list.html.twig', [
-            'class' => $class,
-            'activities' => $activities,
-            'guarantees' => $guarantees,
-        ]);
-    }
 
     #[Route('/class/{id}/activity/create', name: 'activity_create')]
     public function activity_create($id, Request $request): Response
@@ -94,7 +72,7 @@ class ClassActivityController extends AbstractController
             $this->em->persist($newActivity);
             $this->em->flush();
 
-            return $this->redirectToRoute('class_activities', ['id' => $id]);
+            return $this->redirectToRoute('class_detail', ['id' => $id]);
         }
 
         return $this->render('class_activity/activity_create.html.twig', [
@@ -135,7 +113,7 @@ class ClassActivityController extends AbstractController
             }
 
             $this->em->flush();
-            return $this->redirectToRoute('class_activities', ['id' => $id_class]);
+            return $this->redirectToRoute('class_detail', ['id' => $id_class]);
         }
 
         return $this->render('class_activity/activity_edit.html.twig', [
@@ -165,7 +143,7 @@ class ClassActivityController extends AbstractController
             $this->em->flush();
         }
 
-        return $this->redirectToRoute('class_activities', ['id' => $id_class]);
+        return $this->redirectToRoute('class_detail', ['id' => $id_class]);
     }
 
     #[Route('/class/{id_class}/activity/{id_activity}/schedule', name: 'activity_schedule')]
@@ -283,7 +261,7 @@ class ClassActivityController extends AbstractController
             }
 
             $this->em->flush();
-            return $this->redirectToRoute('class_activities', ['id' => $id_class]);
+            return $this->redirectToRoute('class_detail', ['id' => $id_class]);
         }
 
         // get the set time into a string

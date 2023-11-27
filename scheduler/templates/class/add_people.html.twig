@@ -17,8 +17,8 @@
 
     <h2>Vyucujici:</h2>
     <ul>
-        {% for t in class.people %}
-            <li>{{ t.login }} - <a href="/class/{{ class.id }}/remove_teacher/{{ t.id }}">REMOVE</a></li>
+        {% for at in assigned_teachers %}
+            <li>{{ at.login }} - <a href="/class/{{ class.id }}/remove_teacher/{{ at.id }}">REMOVE</a></li>
         {% endfor %}
     </ul>
     <h3>Pridat vyucujiciho:</h3>

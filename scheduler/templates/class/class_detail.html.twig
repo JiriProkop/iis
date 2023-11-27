@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% if class is not null %}{{ class.abbreviation }} Detail{% endif %}{% endblock %}
+
+{% block body %}
+    {% if class is not null %}
+        <h1>{{ class.abbreviation }} - {{ class.name }}</h1>
+        <h2>Credits: {{ class.credits }}</h2>
+        {% if class.guarantor is not null %}<h3>Guarantor: {{ class.guarantor.login }}</h3>{% endif %}
+        {% if teachers is not null %}<h3>Teachers:
+            {% for t in teachers %}
+                {{ t.login }} -
+            {% endfor %}
+        </h3>{% endif %}
+        <p>{{ class.anotation }}</p>
+
+        {% if class.activities is not null %}
+            <h3>Class activities:</h3>
+            <ul>
+                {% for activity in class.activities %}
+                    <li>
+                        <b>Name:</b> {{ activity.name }} <b>Repetition:</b> {{ activity.repetition }} <b>Length:</b> {{ activity.length }}
+                        {% if guarantees %}
+                            <a href="/class/{{ class.id }}/activity/{{ activity.id }}/schedule">SCHEDULE</a> -
+                            <a href="/class/{{ class.id }}/activity/{{ activity.id }}/edit">EDIT</a> -
+                            <a href="/class/{{ class.id }}/activity/{{ activity.id }}/delete">DELETE</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% if guarantees %}
+            <a href="/class/{{ class.id }}/activity/create">Create activity</a>
+        {% endif %}
+    {% else %}
+        This class does not exist!
+    {% endif %}
+{% endblock %}

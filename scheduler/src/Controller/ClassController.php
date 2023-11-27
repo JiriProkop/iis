@@ -54,6 +54,34 @@ class ClassController extends AbstractController
         ]);
     }
 
+    #[Route('/class/{id}/detail', name: 'class_detail')]
+    public function class_detail($id): Response
+    {
+        $user = $this->getUser();
+
+        $guarantees = false;
+        if (in_array('ROLE_ADMIN', $user->getRoles()) || ($user != null && $class->getGuarantor()->getId() == $user->getId())) {
+            $guarantees = true;
+        }
+
+        $class = $this->classRepository->find($id);
+
+        $teachers = array();
+        if ($class != null) {
+            foreach ($class->getPeople() as $person) {
+                if (in_array('ROLE_TEACHER', $person->getRoles())) {
+                    $teachers[] = $person;
+                }
+            }
+        }
+
+        return $this->render('class/class_detail.html.twig', [
+            'class' => $class,
+            'teachers' => $teachers,
+            'guarantees' => $guarantees,
+        ]);
+    }
+
     #[Route('/class/{id}/register', name: 'class_register')]
     public function class_register($id): Response
     {
@@ -155,10 +183,21 @@ class ClassController extends AbstractController
             }
         }
 
+        // get already assigned teachers
+        $assigned_teachers = array();
+        if ($class != null) {
+            foreach ($class->getPeople() as $person) {
+                if (in_array('ROLE_TEACHER', $person->getRoles())) {
+                    $assigned_teachers[] = $person;
+                }
+            }
+        }
+
         return $this->render('class/add_people.html.twig', [
             'class' => $class,
             'guarantors' => $guarantors,
-            'teachers' => $teachers
+            'teachers' => $teachers,
+            'assigned_teachers' => $assigned_teachers
         ]);
     }
 
